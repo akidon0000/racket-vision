@@ -2,19 +2,20 @@ import AVFoundation
 import CoreVideo
 import CourtFit
 import QuartzCore
+import CourtLineOverlay
 import SwiftUI
 import UIKit
 
 /// 動画を流し、コートの検出の結果を枠で重ねる。
-struct PlayerView: View {
+public struct PlayerView: View {
     @StateObject private var model: PlayerModel
     @Environment(\.dismiss) private var dismiss
 
-    init(url: URL) {
+    public init(url: URL) {
         _model = StateObject(wrappedValue: PlayerModel(url: url))
     }
 
-    var body: some View {
+    public var body: some View {
         GeometryReader { proxy in
             let rect = fitRect(container: proxy.size, video: model.videoSize)
             ZStack {
@@ -55,38 +56,6 @@ struct PlayerView: View {
         let found = model.quads.isEmpty ? "検出なし" : "検出あり"
         guard let milliseconds = model.milliseconds else { return found }
         return String(format: "%@  %.1f ms", found, milliseconds)
-    }
-}
-
-/// 動画の表示の範囲（縦横比を保って、枠の中に収める）。
-func fitRect(container: CGSize, video: CGSize) -> CGRect {
-    guard video.width > 0, video.height > 0 else { return CGRect(origin: .zero, size: container) }
-    let scale = min(container.width / video.width, container.height / video.height)
-    let width = video.width * scale
-    let height = video.height * scale
-    return CGRect(x: (container.width - width) / 2, y: (container.height - height) / 2, width: width, height: height)
-}
-
-/// 検出した四角形を、表示の範囲に合わせて描く。
-struct QuadsOverlay: View {
-    let quads: [DetectedQuad]
-    let rect: CGRect
-
-    var body: some View {
-        Canvas { context, _ in
-            for quad in quads {
-                // DetectedQuad は左下が原点の正規化座標。画面は左上が原点。
-                let points = quad.corners.map {
-                    CGPoint(x: rect.minX + $0.x * rect.width, y: rect.minY + (1 - $0.y) * rect.height)
-                }
-                var path = Path()
-                path.move(to: points[0])
-                points.dropFirst().forEach { path.addLine(to: $0) }
-                path.closeSubpath()
-                context.stroke(path, with: .color(.pink), lineWidth: 4)
-            }
-        }
-        .allowsHitTesting(false)
     }
 }
 

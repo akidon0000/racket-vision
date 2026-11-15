@@ -29,3 +29,4 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: dev.akidon0000.samples.CourtDemo
         TARGETED_DEVICE_FAMILY: "1"
+        INFOPLIST_KEY_NSCameraUsageDescription: "コートの検出を試すために、カメラの映像を使います（撮影した映像は保存しません）。"

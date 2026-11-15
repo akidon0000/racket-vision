@@ -2,7 +2,7 @@
 
 import PackageDescription
 
-// デモの機能（動画の一覧、動画の再生と検出の表示）。アプリの殻（App/）から取り込む。
+// デモの機能。アプリの殻（DemoApp/App）から取り込む。
 // コートの検出は、同じリポジトリの CourtFit（ルートのパッケージ）を使う。
 let package = Package(
     name: "DemoLibrary",
@@ -16,9 +16,28 @@ let package = Package(
         .package(path: "../..")
     ],
     targets: [
+        // 枠を描く部品と、表示の範囲の計算（動画とカメラで共通）
+        .target(
+            name: "CourtLineOverlay",
+            dependencies: [.product(name: "CourtFit", package: "racket-vision")],
+            swiftSettings: [.swiftLanguageMode(.v5)]
+        ),
+        // 動画を流しながら、コートの検出の枠を重ねる
+        .target(
+            name: "VideoPlayback",
+            dependencies: ["CourtLineOverlay", .product(name: "CourtFit", package: "racket-vision")],
+            swiftSettings: [.swiftLanguageMode(.v5)]
+        ),
+        // カメラの映像に、コートの検出の枠を重ねる
+        .target(
+            name: "CameraDetection",
+            dependencies: ["CourtLineOverlay", .product(name: "CourtFit", package: "racket-vision")],
+            swiftSettings: [.swiftLanguageMode(.v5)]
+        ),
+        // 一覧の画面（動画の一覧と、カメラの入口）
         .target(
             name: "DemoFeature",
-            dependencies: [.product(name: "CourtFit", package: "racket-vision")],
+            dependencies: ["VideoPlayback", "CameraDetection"],
             swiftSettings: [.swiftLanguageMode(.v5)]
         )
     ]

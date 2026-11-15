@@ -1,6 +1,9 @@
+import CameraDetection
 import SwiftUI
+import VideoPlayback
 
-/// アプリに入っている動画の一覧。選ぶと、その動画をコートの検出つきで流す。
+/// 一覧の画面。一番上にカメラで撮影する入口を置き、その下にアプリに入っている動画を並べる。
+/// 選んだ動画は、コートの検出の枠つきで流す。
 public struct VideoListView: View {
     public init() {}
 
@@ -9,13 +12,22 @@ public struct VideoListView: View {
 
     public var body: some View {
         List {
-            if videos.isEmpty {
-                Text("動画が入っていません。DemoApp/videos に動画を置き、アプリを作り直してください。")
-                    .foregroundStyle(.secondary)
+            Section {
+                NavigationLink {
+                    CameraView()
+                } label: {
+                    Label("カメラで撮影", systemImage: "camera")
+                }
             }
-            ForEach(videos, id: \.self) { url in
-                NavigationLink(url.deletingPathExtension().lastPathComponent) {
-                    PlayerView(url: url)
+            Section("動画") {
+                if videos.isEmpty {
+                    Text("動画が入っていません。DemoApp/videos に動画を置き、アプリを作り直してください。")
+                        .foregroundStyle(.secondary)
+                }
+                ForEach(videos, id: \.self) { url in
+                    NavigationLink(url.deletingPathExtension().lastPathComponent) {
+                        PlayerView(url: url)
+                    }
                 }
             }
         }
