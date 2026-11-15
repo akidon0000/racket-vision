@@ -8,6 +8,7 @@ import UIKit
 /// 動画を流し、コートの検出の結果を枠で重ねる。
 struct PlayerView: View {
     @StateObject private var model: PlayerModel
+    @Environment(\.dismiss) private var dismiss
 
     init(url: URL) {
         _model = StateObject(wrappedValue: PlayerModel(url: url))
@@ -22,6 +23,21 @@ struct PlayerView: View {
                 QuadsOverlay(quads: model.quads, rect: rect)
             }
         }
+        // 画面いっぱいに出す（安全領域の外まで、黒い背景と映像を広げる）。
+        .ignoresSafeArea()
+        .overlay(alignment: .topLeading) {
+            Button {
+                dismiss()
+            } label: {
+                Image(systemName: "xmark")
+                    .font(.headline)
+                    .foregroundStyle(.white)
+                    .padding(12)
+                    .background(.black.opacity(0.6), in: Circle())
+            }
+            .padding(.leading, 16)
+            .padding(.top, 8)
+        }
         .overlay(alignment: .bottom) {
             Text(statusText)
                 .font(.footnote.monospaced())
@@ -30,6 +46,7 @@ struct PlayerView: View {
                 .foregroundStyle(.white)
                 .padding(.bottom, 24)
         }
+        .toolbar(.hidden, for: .navigationBar)
         .task { await model.load() }
         .onDisappear { model.stop() }
     }
