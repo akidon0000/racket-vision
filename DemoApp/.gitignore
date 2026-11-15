@@ -1,7 +1,7 @@
 # xcodegen で作る（App/project.yml から生成する）
 /App/*.xcodeproj/
 
-# サンプル動画（fetch-videos.sh で ~/Downloads/sample からコピーする）
+# サンプル動画（手で置く。アプリのビルド時に入る）
 /videos/
 
 .build/

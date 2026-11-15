@@ -1,5 +1,5 @@
 # アプリの殻の定義。xcodegen generate で CourtDemo.xcodeproj を作る（生成物は git の対象外）。
-# 機能は ../Library（DemoFeature）。動画は ../videos（gitignore。fetch-videos.sh で ~/Downloads/sample から入れる）から、アプリの中に入る。
+# 機能は ../Library（DemoFeature）。動画は ../videos（gitignore。手で置く）から、アプリの中に入る。
 name: CourtDemo
 options:
   bundleIdPrefix: dev.akidon0000.samples

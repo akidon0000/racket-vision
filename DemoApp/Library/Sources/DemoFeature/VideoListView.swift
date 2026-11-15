@@ -10,7 +10,7 @@ public struct VideoListView: View {
     public var body: some View {
         List {
             if videos.isEmpty {
-                Text("動画が入っていません。samples/court-sample/fetch-videos.sh を実行してから、アプリを作り直してください。")
+                Text("動画が入っていません。DemoApp/videos に動画を置き、アプリを作り直してください。")
                     .foregroundStyle(.secondary)
             }
             ForEach(videos, id: \.self) { url in
