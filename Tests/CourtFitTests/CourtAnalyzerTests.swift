@@ -21,7 +21,7 @@ private func makePixelBuffer() throws -> CVPixelBuffer {
 struct CourtAnalyzerTests {
     @Test func defaultMethodsAreOnExceptHeavyOnes() {
         let switches = CourtMethodSwitches()
-        for method in CourtDetectionMethod.allCases {
+        for method in CourtDetectionMethod.builtIn {
             #expect(switches.isEnabled(method) == !CourtMethodSwitches.offByDefault.contains(method))
         }
     }
@@ -55,7 +55,7 @@ struct CourtAnalyzerTests {
     @Test func allMethodsOffGivesNoOutcomes() throws {
         let switches = CourtMethodSwitches(enabled: [])
         let analyzer = CourtAnalyzer(
-            detectors: CourtDetectionMethod.allCases.map { StubDetector(method: $0) },
+            detectors: CourtDetectionMethod.builtIn.map { StubDetector(method: $0) },
             switches: switches
         )
 

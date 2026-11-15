@@ -24,7 +24,7 @@ struct DemoVideoQuadsExport: Encodable {
         let detectors = detectorsToCompare().map { detector -> any CourtRectangleDetector in
             detector is TrackingLineModelCourtRectangleDetector ? TrackingLineModelCourtRectangleDetector(searchInterval: 0) : detector
         }
-        let analyzer = CourtAnalyzer(detectors: detectors, switches: CourtMethodSwitches(enabled: Set(CourtDetectionMethod.allCases)))
+        let analyzer = CourtAnalyzer(detectors: detectors, switches: CourtMethodSwitches(enabled: Set(detectors.map(\.method))))
         let asset = AVURLAsset(url: video)
         let duration = try await asset.load(.duration).seconds
         let generator = AVAssetImageGenerator(asset: asset)

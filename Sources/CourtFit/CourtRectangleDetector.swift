@@ -4,28 +4,47 @@ import ImageIO
 import Vision
 
 /// 検出の方式。複数の方式を同じ画面で比べるために使う。
-public enum CourtDetectionMethod: String, CaseIterable, Sendable {
-    /// Vision の矩形検出。
-    case vision
-    /// 直線（ハフ変換）の組から四角形を作り、白線の支持率で選ぶ。
-    case lineSearch
-    /// 白線の芯から直線を取り、図面の線との対応を総当たりして探す。フレームごとに最初から探す。
-    case lineModel
-    /// `lineModel` で見つけた後に、元の大きさの画像で合わせ直す。
-    case lineModelPolished
-    /// `lineModel` と同じ探し方で、見つけた後は前のフレームから合わせ直す。
-    case lineModelTracking
-
+///
+/// 使う側のアプリが、自前の方式を足せるように、列挙ではなく値にしている。足すときは、
+/// `extension CourtDetectionMethod { static let myMethod = CourtDetectionMethod(rawValue: "myMethod", label: "…", color: …) }` のように書く。
+/// 同じかどうかは `rawValue` だけで決まる。
+public struct CourtDetectionMethod: Hashable, Sendable, CustomStringConvertible {
+    /// 方式を見分ける名前（例: `lineModelTracking`）。環境変数 `COURT_METHODS` でも、この名前で指定する。
+    public let rawValue: String
     /// 画面やパネルに出す名前。
-    public var label: String {
-        switch self {
-        case .vision: "Vision"
-        case .lineSearch: "線の探索"
-        case .lineModel: "線の対応"
-        case .lineModelPolished: "線の対応+等倍で仕上げ"
-        case .lineModelTracking: "線の対応+追従"
-        }
+    public let label: String
+    /// 線の色（赤・緑・青、それぞれ 0〜1）。映像の上で見やすいよう、鮮やかな色にする。
+    public let color: SIMD3<Double>
+
+    public init(rawValue: String, label: String, color: SIMD3<Double>) {
+        self.rawValue = rawValue
+        self.label = label
+        self.color = color
     }
+
+    public var description: String { rawValue }
+
+    public static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.rawValue == rhs.rawValue
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(rawValue)
+    }
+
+    /// Vision の矩形検出。
+    public static let vision = Self(rawValue: "vision", label: "Vision", color: SIMD3(0.2, 1.0, 0.3))
+    /// 直線（ハフ変換）の組から四角形を作り、白線の支持率で選ぶ。
+    public static let lineSearch = Self(rawValue: "lineSearch", label: "線の探索", color: SIMD3(0.2, 0.9, 1.0))
+    /// 白線の芯から直線を取り、図面の線との対応を総当たりして探す。フレームごとに最初から探す。
+    public static let lineModel = Self(rawValue: "lineModel", label: "線の対応", color: SIMD3(1.0, 0.5, 0.0))
+    /// `lineModel` で見つけた後に、元の大きさの画像で合わせ直す。
+    public static let lineModelPolished = Self(rawValue: "lineModelPolished", label: "線の対応+等倍で仕上げ", color: SIMD3(1.0, 1.0, 1.0))
+    /// `lineModel` と同じ探し方で、見つけた後は前のフレームから合わせ直す。
+    public static let lineModelTracking = Self(rawValue: "lineModelTracking", label: "線の対応+追従", color: SIMD3(1.0, 0.2, 0.9))
+
+    /// このパッケージにある方式。
+    public static let builtIn: [Self] = [.vision, .lineSearch, .lineModel, .lineModelPolished, .lineModelTracking]
 }
 
 /// 1 フレームに対する、1 方式の検出の結果。

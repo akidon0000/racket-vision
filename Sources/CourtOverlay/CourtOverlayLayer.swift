@@ -4,21 +4,9 @@ import QuartzCore
 import UIKit
 
 public extension CourtDetectionMethod {
-    /// 方式の線の色。Vision は緑、線の探索は水色、線の対応は橙・白・桃。映像の上で見やすいよう、鮮やかな色にしている。
+    /// 方式の線の色（`color` から作る）。
     var overlayColor: UIColor {
-        // 色の値は意図して指定している（システムの色は暗いため）。そのため object_literal の規則は、この行だけ外す。
-        switch self {
-        // swiftlint:disable:next object_literal
-        case .vision: UIColor(red: 0.2, green: 1.0, blue: 0.3, alpha: 1)
-        // swiftlint:disable:next object_literal
-        case .lineSearch: UIColor(red: 0.2, green: 0.9, blue: 1.0, alpha: 1)
-        // swiftlint:disable:next object_literal
-        case .lineModel: UIColor(red: 1.0, green: 0.5, blue: 0.0, alpha: 1)
-        // swiftlint:disable:next object_literal
-        case .lineModelPolished: UIColor(red: 1.0, green: 1.0, blue: 1.0, alpha: 1)
-        // swiftlint:disable:next object_literal
-        case .lineModelTracking: UIColor(red: 1.0, green: 0.2, blue: 0.9, alpha: 1)
-        }
+        UIColor(red: CGFloat(color.x), green: CGFloat(color.y), blue: CGFloat(color.z), alpha: 1)
     }
 }
 

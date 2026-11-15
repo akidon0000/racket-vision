@@ -10,7 +10,7 @@
 ## 使う
 
 ```swift
-.package(url: "git@github.com:akidon0000/racket-vision.git", from: "0.1.0")
+.package(url: "https://github.com/akidon0000/racket-vision.git", revision: "<コミット>")
 ```
 
 ```swift
@@ -22,7 +22,7 @@ let outcomes = analyzer.analyze(pixelBuffer, orientation: .up) // 32BGRA の CVP
 
 一番よく当たるのは `TrackingLineModelCourtRectangleDetector`（線の対応+追従）。仕組みと、方式ごとの精度は [docs/accuracy/court.md](docs/accuracy/court.md) にある。
 
-検出は画素を 1 つずつ回す計算が多い。最適化なし（Debug）でビルドすると 1 フレームに数秒かかるので、アプリの側でこのパッケージを最適化してビルドする。
+検出は画素を 1 つずつ回す計算が多いので、`CourtFit` は Debug でも最適化してビルドする設定にしてある（`unsafeFlags`）。SwiftPM は、版（`from:`）で取り込んだ依存先の `unsafeFlags` を許さないので、取り込むときはコミット（`revision:`）かブランチで指定する。
 
 ## 測る
 
@@ -52,5 +52,7 @@ swiftlint lint --strict
 ```
 
 ## ほかの競技に広げるとき
+
+方式は `CourtDetectionMethod` の値で表す。使う側のアプリが自前の方式を足すときは、`extension CourtDetectionMethod { static let myMethod = CourtDetectionMethod(rawValue: "myMethod", label: "…", color: SIMD3(…)) }` と書き、`CourtRectangleDetector` を実装する。
 
 `CourtModel` は寸法を差し替えられるが、線の並び（ベースライン、キッチンの線、センターライン）はピックルボールの形で決め打ちになっている。テニスのサービスラインやダブルスのサイドラインを入れるときは、線の並びも図面ごとに持たせる。
