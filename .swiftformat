@@ -1,0 +1,163 @@
+# 有効化する判断をしたRules
+--enable fileHeader
+--header strip
+--enable redundantSwiftTestingSuite
+--enable redundantSendable
+--enable anyObjectProtocol
+--enable applicationMain
+--enable assertionFailures
+--enable blankLinesBetweenChainedFunctions
+--enable docCommentsBeforeModifiers
+--enable fileMacro
+--enable preferCountWhere
+--enable spaceAroundBrackets
+--enable environmentEntry
+--enable noExplicitOwnership
+--enable preferSwiftTesting
+--enable blankLineAfterImports
+--enable blankLinesAroundMark
+--enable blankLinesAtEndOfScope
+--enable blankLinesAtStartOfScope
+--enable blankLinesBetweenScopes
+--enable braces
+--enable modifierOrder
+--enable preferKeyPath
+--enable redundantPattern
+--enable hoistTry
+--enable leadingDelimiters
+--enable opaqueGenericParameters
+--enable redundantFileprivate
+--enable redundantInit
+--enable redundantLetError
+--enable redundantRawValues
+--enable redundantBreak
+--enable redundantGet
+--enable redundantInternal
+--enable linebreakAtEndOfFile
+--enable headerFileName
+--enable duplicateImports
+--enable consistentSwitchCaseSpacing
+--enable consecutiveSpaces
+--enable consecutiveBlankLines
+--enable linebreaks
+--enable initCoderUnavailable
+--enable redundantBackticks
+--enable redundantExtensionACL
+--enable redundantLet
+--enable redundantNilInit
+--enable redundantObjc
+--enable redundantEquatable
+--enable hoistAwait
+--enable emptyExtensions
+--enable isEmpty
+--enable genericExtensions
+--enable wrapEnumCases
+--enable blockComments
+--enable elseOnSameLine
+--guardelse same-line # elseOnSameLineのoption
+--enable spaceAroundBraces
+--enable spaceAroundComments
+--enable spaceAroundParens
+--enable spaceAroundGenerics
+--enable spaceInsideBrackets
+--enable spaceInsideComments
+--enable spaceInsideGenerics
+--enable spaceInsideBraces
+--enable spaceInsideParens
+--enable emptyBraces
+--enable sortImports
+--importgrouping testable-first # sortImportsのoption
+--enable sortTypealiases
+--enable redundantTypedThrows
+--enable redundantVoidReturnType
+--enable redundantStaticSelf
+--enable redundantType
+--enable propertyTypes
+--propertytypes inferred # redundantType, propertyTypeのoption
+--enable redundantVariable
+--enable strongifiedSelf
+--enable todos
+--enable swiftTestingTestCaseNames
+--enable semicolons
+--enable unusedPrivateDeclarations
+--enable void
+--enable typeSugar
+--shortoptionals always # typeSugarのoption
+--enable yodaConditions
+--enable trailingClosures
+--enable trailingCommas
+--commas inline #trailingCommasのoption
+--enable blankLinesBetweenImports
+--enable spaceAroundOperators
+--ranges no-space
+--enable conditionalAssignment
+--enable extensionAccessControl
+--enable redundantParens
+--enable trailingSpace
+--enable redundantOptionalBinding
+--enable docComments
+--enable wrapArguments
+--wraparguments before-first # wrapArgumentsのoption
+--wrapparameters before-first # wrapArgumentsのoption
+--wrapcollections before-first # wrapArgumentsのoption
+--wrapreturntype never # wrapArgumentsのoption
+--wrapeffects never # wrapArgumentsのoption
+--wrapconditions preserve # wrapArgumentsのoption
+--wraptypealiases preserve # wrapArgumentsのoption
+--enable wrapAttributes
+--funcattributes preserve # wrapAttributesのoption
+--typeattributes preserve # wrapAttributesのoption
+--storedvarattrs preserve # wrapAttributesのoption
+--computedvarattrs preserve # wrapAttributesのoption
+--complexattrs prev-line # wrapAttributesのoption
+--enable indent
+--ifdef no-indent
+# 無効化する判断をしたRules
+--disable andOperator
+--disable privateStateVariables
+--disable numberFormatting
+--disable wrapMultilineConditionalAssignment
+--disable preferForLoop
+--disable sortDeclarations
+--disable sortSwitchCases
+--disable hoistPatternLet
+--disable blankLineAfterSwitchCase
+--disable blankLinesAfterGuardStatements
+--disable redundantClosure
+--disable enumNamespaces
+--disable unusedArguments
+--disable acronyms
+--disable markTypes
+--disable organizeDeclarations
+--disable wrapMultilineFunctionChains
+--disable wrapSingleLineComments
+--disable wrapLoopBodies
+--disable wrapSwitchCases
+--disable redundantReturn
+--disable strongOutlets
+--disable wrap
+--disable wrapConditionalBodies
+--disable wrapMultilineStatementBraces
+--disable redundantSelf
+--disable validateTestCases
+--disable singlePropertyPerLine
+--disable wrapPropertyBodies
+--disable wrapFunctionBodies
+--disable redundantMemberwiseInit
+--disable testSuiteAccessControl
+--disable preferFinalClasses
+--disable noGuardInTests
+--disable simplifyGenericConstraints
+--disable redundantViewBuilder
+--disable noForceUnwrapInTests
+--disable redundantThrows
+--disable redundantAsync
+--disable redundantPublic
+--disable modifiersOnSameLine
+# Depricated Rules
+--disable sortedImports
+--disable sortedSwitchCases
+--disable specifiers
+--disable throwingTests
+# Excluded Files
+--exclude build, Pickleball/DerivedData, Pickleball/.build, **/DerivedData/**

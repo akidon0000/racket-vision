@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>コートの正解を付ける</title>
+<style>
+  body { font-family: -apple-system, sans-serif; margin: 12px; background: #1c1c1e; color: #f2f2f7; }
+  #layout { display: flex; gap: 12px; align-items: flex-start; }
+  #stage { position: relative; flex: 1; min-width: 0; }
+  #view { width: 100%; cursor: crosshair; display: block; background: #000; }
+  #side { width: 300px; flex: none; }
+  #loupe { width: 300px; height: 300px; background: #000; image-rendering: pixelated; }
+  ol { padding-left: 24px; margin: 8px 0; }
+  li { cursor: pointer; padding: 2px 4px; font-size: 13px; }
+  li.current { background: #0a84ff; }
+  li.done { color: #30d158; }
+  li.current.done { color: #fff; }
+  button, input { font-size: 13px; margin: 2px 0; }
+  textarea { width: 100%; height: 220px; font-family: ui-monospace, monospace; font-size: 11px; }
+  p { font-size: 12px; margin: 6px 0; color: #aeaeb2; }
+</style>
+</head>
+<body>
+<div id="layout">
+  <div id="stage">
+    <input type="file" id="file" accept="image/png,image/jpeg">
+    <canvas id="view"></canvas>
+    <p>クリックで、選んでいる交点の位置を決める。矢印キーで 1 ピクセルずつ動かす（Shift を押すと 0.25 ピクセル）。
+       near はカメラに近い側（画面の下側）、left と right は画面の上での左右。</p>
+  </div>
+  <div id="side">
+    <canvas id="loupe" width="300" height="300"></canvas>
+    <ol id="list"></ol>
+    <button id="skip">見えない（飛ばす）</button>
+    <button id="clear">このフレームを消す</button>
+    <div>動画 <input id="video" size="30"></div>
+    <div>秒 <input id="seconds" size="6"></div>
+    <button id="add">このフレームを JSON に足す</button>
+    <button id="copy">JSON をコピー</button>
+    <textarea id="json" placeholder="続きから付けるときは、ここに今の JSON を貼る"></textarea>
+  </div>
+</div>
+<script>
+const KEYPOINTS = [
+  ["nearLeftCorner", "手前のベースライン × 左のサイドライン"],
+  ["nearRightCorner", "手前のベースライン × 右のサイドライン"],
+  ["farRightCorner", "奥のベースライン × 右のサイドライン"],
+  ["farLeftCorner", "奥のベースライン × 左のサイドライン"],
+  ["nearKitchenLeft", "手前のキッチンの線 × 左のサイドライン"],
+  ["nearKitchenRight", "手前のキッチンの線 × 右のサイドライン"],
+  ["farKitchenRight", "奥のキッチンの線 × 右のサイドライン"],
+  ["farKitchenLeft", "奥のキッチンの線 × 左のサイドライン"],
+  ["nearBaselineCenter", "手前のベースライン × センターライン"],
+  ["nearKitchenCenter", "手前のキッチンの線 × センターライン"],
+  ["farKitchenCenter", "奥のキッチンの線 × センターライン"],
+  ["farBaselineCenter", "奥のベースライン × センターライン"]
+];
+const view = document.getElementById("view");
+const loupe = document.getElementById("loupe");
+const list = document.getElementById("list");
+const state = { image: null, points: {}, current: 0, cursor: null };
+
+// 画像を読む。ファイル名が「<動画の名前>-<秒>s.png」なら、動画と秒の欄を埋める。
+function loadImage(image, fileName) {
+  state.image = image;
+  state.points = {};
+  state.current = 0;
+  view.width = image.naturalWidth;
+  view.height = image.naturalHeight;
+  const match = /^(.*)-(\d+(?:\.\d+)?)s\.(png|jpe?g)$/i.exec(fileName || "");
+  if (match) {
+    document.getElementById("video").value = match[1] + ".mp4";
+    document.getElementById("seconds").value = match[2];
+  }
+  draw();
+}
+
+function imagePoint(event) {
+  const rect = view.getBoundingClientRect();
+  return [(event.clientX - rect.left) * view.width / rect.width, (event.clientY - rect.top) * view.height / rect.height];
+}
+
+function draw() {
+  const context = view.getContext("2d");
+  if (!state.image) return;
+  context.drawImage(state.image, 0, 0);
+  const radius = Math.max(4, view.width / 320);
+  KEYPOINTS.forEach(([name], index) => {
+    const point = state.points[name];
+    if (!point) return;
+    context.strokeStyle = index === state.current ? "#ffd60a" : "#30d158";
+    context.lineWidth = radius / 3;
+    context.beginPath();
+    context.moveTo(point[0] - radius * 2, point[1]); context.lineTo(point[0] + radius * 2, point[1]);
+    context.moveTo(point[0], point[1] - radius * 2); context.lineTo(point[0], point[1] + radius * 2);
+    context.stroke();
+    context.fillStyle = context.strokeStyle;
+    context.font = `${radius * 4}px sans-serif`;
+    context.fillText(String(index + 1), point[0] + radius * 2, point[1] - radius * 2);
+  });
+  list.innerHTML = "";
+  KEYPOINTS.forEach(([name, label], index) => {
+    const item = document.createElement("li");
+    item.textContent = label;
+    if (index === state.current) item.classList.add("current");
+    if (state.points[name]) item.classList.add("done");
+    item.onclick = () => { state.current = index; draw(); };
+    list.appendChild(item);
+  });
+  drawLoupe();
+}
+
+// 拡大鏡。選んでいる交点（まだ無ければカーソル）のまわりを 10 倍で見せる。
+function drawLoupe() {
+  const context = loupe.getContext("2d");
+  context.fillStyle = "#000";
+  context.fillRect(0, 0, 300, 300);
+  const name = KEYPOINTS[state.current] && KEYPOINTS[state.current][0];
+  const center = state.cursor || state.points[name];
+  if (!state.image || !center) return;
+  context.imageSmoothingEnabled = false;
+  context.drawImage(state.image, center[0] - 15, center[1] - 15, 30, 30, 0, 0, 300, 300);
+  context.strokeStyle = "#ffd60a";
+  context.beginPath();
+  context.moveTo(150, 0); context.lineTo(150, 300);
+  context.moveTo(0, 150); context.lineTo(300, 150);
+  context.stroke();
+}
+
+function advance() {
+  if (state.current < KEYPOINTS.length - 1) state.current += 1;
+  state.cursor = null;
+  draw();
+}
+
+view.addEventListener("mousemove", (event) => { state.cursor = imagePoint(event); drawLoupe(); });
+view.addEventListener("mouseleave", () => { state.cursor = null; drawLoupe(); });
+view.addEventListener("click", (event) => {
+  if (!state.image) return;
+  state.points[KEYPOINTS[state.current][0]] = imagePoint(event);
+  advance();
+});
+document.addEventListener("keydown", (event) => {
+  const moves = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] };
+  const move = moves[event.key];
+  if (!move || ["INPUT", "TEXTAREA"].includes(document.activeElement.tagName)) return;
+  // 動かすのは、選んでいる交点。置いた直後は次へ進んでいるので、まだ置いていなければ 1 つ前を動かす。
+  let index = state.current;
+  if (!state.points[KEYPOINTS[index][0]] && index > 0) index -= 1;
+  const point = state.points[KEYPOINTS[index][0]];
+  if (!point) return;
+  event.preventDefault();
+  const step = event.shiftKey ? 0.25 : 1;
+  point[0] += move[0] * step;
+  point[1] += move[1] * step;
+  state.current = index;
+  state.cursor = null;
+  draw();
+});
+document.getElementById("skip").onclick = () => { delete state.points[KEYPOINTS[state.current][0]]; advance(); };
+document.getElementById("clear").onclick = () => { state.points = {}; state.current = 0; draw(); };
+document.getElementById("file").onchange = (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+  const image = new Image();
+  image.onload = () => loadImage(image, file.name);
+  image.src = URL.createObjectURL(file);
+};
+
+// JSON の欄に、今のフレームを足す。同じ秒のフレームがあれば置き換える。動画の名前が違えば、新しく作り直す。
+function addFrame() {
+  if (!state.image) return;
+  const video = document.getElementById("video").value.trim();
+  const seconds = Number(document.getElementById("seconds").value);
+  const area = document.getElementById("json");
+  let annotation = null;
+  try { annotation = JSON.parse(area.value); } catch (error) { annotation = null; }
+  if (!annotation || annotation.video !== video) {
+    annotation = { video, imageWidth: view.width, imageHeight: view.height, frames: [] };
+  }
+  const points = {};
+  KEYPOINTS.forEach(([name]) => {
+    const point = state.points[name];
+    if (point) points[name] = [Math.round(point[0] * 100) / 100, Math.round(point[1] * 100) / 100];
+  });
+  annotation.frames = annotation.frames.filter((frame) => frame.seconds !== seconds);
+  annotation.frames.push({ seconds, points });
+  annotation.frames.sort((a, b) => a.seconds - b.seconds);
+  area.value = JSON.stringify(annotation, null, 2) + "\n";
+}
+document.getElementById("add").onclick = addFrame;
+document.getElementById("copy").onclick = () => navigator.clipboard.writeText(document.getElementById("json").value);
+</script>
+</body>
+</html>

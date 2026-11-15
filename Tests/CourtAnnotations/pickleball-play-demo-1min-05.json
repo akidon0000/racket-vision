@@ -1,0 +1,101 @@
+{
+  "video": "pickleball-play-demo-1min-05.mp4",
+  "imageWidth": 1920,
+  "imageHeight": 1080,
+  "frames": [
+    {
+      "seconds": 21,
+      "points": {
+        "nearLeftCorner": [
+          264.57,
+          891.97
+        ],
+        "nearRightCorner": [
+          1641.83,
+          894.99
+        ],
+        "farRightCorner": [
+          1230.61,
+          541.23
+        ],
+        "farLeftCorner": [
+          692.41,
+          538.2
+        ],
+        "nearKitchenLeft": [
+          507.97,
+          689.39
+        ],
+        "nearKitchenRight": [
+          1405.98,
+          692.41
+        ],
+        "farKitchenRight": [
+          1298.65,
+          600.19
+        ],
+        "farKitchenLeft": [
+          621.35,
+          597.17
+        ],
+        "nearBaselineCenter": [
+          955.46,
+          896.5
+        ],
+        "nearKitchenCenter": [
+          960,
+          695.43
+        ],
+        "farKitchenCenter": [
+          961.51,
+          600.19
+        ],
+        "farBaselineCenter": [
+          960,
+          539.72
+        ]
+      }
+    },
+    {
+      "seconds": 41,
+      "points": {
+        "farRightCorner": [
+          1912.44,
+          675.78
+        ],
+        "farLeftCorner": [
+          1012.91,
+          634.96
+        ],
+        "nearKitchenLeft": [
+          125.48,
+          777.07
+        ],
+        "nearKitchenRight": [
+          1508.79,
+          884.41
+        ],
+        "farKitchenRight": [
+          1762.77,
+          751.37
+        ],
+        "farKitchenLeft": [
+          680.31,
+          692.41
+        ],
+        "nearKitchenCenter": [
+          716.6,
+          822.43
+        ],
+        "farKitchenCenter": [
+          1173.17,
+          718.11
+        ],
+        "farBaselineCenter": [
+          1436.22,
+          656.13
+        ]
+      }
+    }
+  ]
+}

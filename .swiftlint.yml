@@ -1,0 +1,120 @@
+excluded:
+  - .build/
+opt_in_rules:
+  - array_init
+  - closure_end_indentation
+  - closure_spacing
+  - collection_alignment
+  - contains_over_first_not_nil
+  - empty_count
+  - empty_string
+  - empty_xctest_method
+  - explicit_init
+  - fallthrough
+  - fatal_error_message
+  - file_name
+  - first_where
+  - identical_operands
+  - joined_default_parameter
+  - let_var_whitespace
+  - last_where
+  - literal_expression_end_indentation
+  - lower_acl_than_parent
+  - nimble_operator
+  - object_literal
+  - operator_usage_whitespace
+  - overridden_super_call
+  - override_in_extension
+  - pattern_matching_keywords
+  - private_action
+  - private_outlet
+  - prohibited_super_call
+  - quick_discouraged_call
+  - quick_discouraged_focused_test
+  - quick_discouraged_pending_test
+  - redundant_nil_coalescing
+  - redundant_type_annotation
+  - single_test_class
+  - sorted_first_last
+  - static_operator
+  - unavailable_function
+  - unneeded_parentheses_in_closure_argument
+  - untyped_error_in_catch
+  - vertical_parameter_alignment_on_call
+  - vertical_whitespace_closing_braces
+  - vertical_whitespace_opening_braces
+  - xct_specific_matcher
+  - yoda_condition
+disabled_rules:
+  - file_header
+  - force_cast
+  - force_try
+  - number_separator
+  - line_length
+  - todo
+identifier_name:
+  min_length:
+    warning: 1
+    error: 1
+  max_length:
+    warning: 60
+    error: 70
+type_name:
+  max_length:
+    warning: 65
+    error: 70
+nesting:
+  type_level: 2
+file_name:
+  excluded_paths:
+    # @main の型は SwiftUI の App プロトコルと同名にできないため PickleApp。ファイル名は App.swift。
+    - "App/App/App\\.swift$"
+# ADR 0009 と wiki-ios-architecture の決まり。CI では --strict で警告も失敗にするので、warning の値が上限になる
+type_body_length:
+  warning: 200
+  error: 300
+function_body_length:
+  warning: 40
+  error: 80
+file_length:
+  warning: 400
+  error: 600
+cyclomatic_complexity:
+  warning: 10
+  error: 15
+custom_rules:
+  feature_hidden_dependency:
+    name: "Hidden Dependency"
+    included: ".*/Pickleball/Sources/[^/]*Feature/.*\\.swift$"
+    regex: '\b(Date|UUID)\(\)|\bDate\.now\b|(?<![\w])\.now\b|\.shared\b'
+    excluded_match_kinds: [comment, doccomment, string]
+    message: "時刻、ID、共有インスタンスは init で受け取る（wiki-ios-architecture 2 節）"
+    severity: error
+  feature_environment_dependency:
+    name: "Environment Dependency"
+    included: ".*/Pickleball/Sources/[^/]*Feature/.*\\.swift$"
+    regex: '@Environment\(\s*[A-Z][A-Za-z0-9_.]*\.self\s*\)'
+    excluded_match_kinds: [comment, doccomment, string]
+    message: "依存を @Environment で渡さない。init で受け取る（wiki-ios-architecture 2 節）"
+    severity: error
+  feature_availability_check:
+    name: "Availability Check In Feature"
+    included: ".*/Pickleball/Sources/[^/]*Feature/.*\\.swift$"
+    regex: '#(un)?available\('
+    excluded_match_kinds: [comment, doccomment, string]
+    message: "#available は Components と ClientsLive にだけ書く（wiki-ios-architecture 9 節）"
+    severity: error
+  feature_localized_description:
+    name: "Localized Description In Feature"
+    included: ".*/Pickleball/Sources/[^/]*Feature/.*\\.swift$"
+    regex: '\.localizedDescription\b'
+    excluded_match_kinds: [comment, doccomment, string]
+    message: "失敗の enum を switch して文言を決める（wiki-ios-architecture 7 節）"
+    severity: error
+  model_unstructured_task:
+    name: "Task In Model"
+    included: ".*/Pickleball/Sources/[^/]*Feature/.*Model(\\+[^/]*)?\\.swift$"
+    regex: '\bTask(\.detached)?\s*(<[^>]*>)?\s*(\([^)]*\))?\s*\{'
+    excluded_match_kinds: [comment, doccomment, string]
+    message: "モデルの中で Task を作らない。画面の待ちは View の .task から呼ぶ（wiki-ios-architecture 6 節）"
+    severity: error

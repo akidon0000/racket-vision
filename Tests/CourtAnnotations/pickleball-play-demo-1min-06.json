@@ -1,0 +1,37 @@
+{
+  "video": "pickleball-play-demo-1min-06.mp4",
+  "imageWidth": 1920,
+  "imageHeight": 1080,
+  "frames": [
+    {
+      "seconds": 1,
+      "points": {
+        "nearLeftCorner": [356.79, 905.57],
+        "nearRightCorner": [1555.65, 908.6],
+        "farRightCorner": [1238.17, 260.03],
+        "farLeftCorner": [647.06, 257.01],
+        "nearKitchenLeft": [504.94, 572.98],
+        "nearKitchenRight": [1389.35, 572.98],
+        "farKitchenRight": [1306.2, 391.56],
+        "farKitchenLeft": [588.09, 390.05],
+        "nearBaselineCenter": [955.46, 907.09],
+        "nearKitchenCenter": [950.93, 574.49],
+        "farKitchenCenter": [947.91, 393.07],
+        "farBaselineCenter": [944.88, 258.52]
+      }
+    },
+    {
+      "seconds": 41,
+      "points": {
+        "farRightCorner": [580.54, 671.24],
+        "nearKitchenLeft": [690.9, 941.86],
+        "nearKitchenRight": [1445.29, 749.86],
+        "farKitchenRight": [931.28, 704.5],
+        "farKitchenLeft": [164.79, 801.26],
+        "nearKitchenCenter": [1177.7, 823.94],
+        "farKitchenCenter": [610.77, 743.81],
+        "farBaselineCenter": [288.76, 690.9]
+      }
+    }
+  ]
+}
