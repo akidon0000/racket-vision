@@ -11,7 +11,8 @@ let package = Package(
     ],
     products: [
         .library(name: "CourtFit", targets: ["CourtFit"]),
-        .library(name: "CourtOverlay", targets: ["CourtOverlay"])
+        .library(name: "CourtOverlay", targets: ["CourtOverlay"]),
+        .library(name: "BallTracking", targets: ["BallTracking"])
     ],
     targets: [
         // コートの検出。画素を 1 つずつ回す計算が多く、最適化なし（Debug）では 1 フレームに数秒かかる。
@@ -19,6 +20,9 @@ let package = Package(
         .target(name: "CourtFit", swiftSettings: [.unsafeFlags(["-O"], .when(configuration: .debug))]),
         // 検出の線を映像の上に描く（iOS の画面の部品）。
         .target(name: "CourtOverlay", dependencies: ["CourtFit"]),
-        .testTarget(name: "CourtFitTests", dependencies: ["CourtFit"])
+        .testTarget(name: "CourtFitTests", dependencies: ["CourtFit"]),
+        // 球の追跡。全画素を回すので、CourtFit と同じく Debug でも最適化する。
+        .target(name: "BallTracking", swiftSettings: [.unsafeFlags(["-O"], .when(configuration: .debug))]),
+        .testTarget(name: "BallTrackingTests", dependencies: ["BallTracking"])
     ]
 )
