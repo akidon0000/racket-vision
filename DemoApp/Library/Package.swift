@@ -22,10 +22,21 @@ let package = Package(
             dependencies: [.product(name: "CourtFit", package: "racket-vision")],
             swiftSettings: [.swiftLanguageMode(.v5)]
         ),
-        // 動画を流しながら、コートの検出の枠を重ねる
+        // 球の軌跡の点を描く部品
+        .target(
+            name: "BallTrackOverlay",
+            dependencies: [.product(name: "BallTracking", package: "racket-vision")],
+            swiftSettings: [.swiftLanguageMode(.v5)]
+        ),
+        // 動画を流しながら、コートの検出の枠と、球の軌跡の点を重ねる
         .target(
             name: "VideoPlayback",
-            dependencies: ["CourtLineOverlay", .product(name: "CourtFit", package: "racket-vision")],
+            dependencies: [
+                "CourtLineOverlay",
+                "BallTrackOverlay",
+                .product(name: "CourtFit", package: "racket-vision"),
+                .product(name: "BallTracking", package: "racket-vision")
+            ],
             swiftSettings: [.swiftLanguageMode(.v5)]
         ),
         // カメラの映像に、コートの検出の枠を重ねる
