@@ -1,0 +1,31 @@
+# アプリの殻の定義。xcodegen generate で CourtDemo.xcodeproj を作る（生成物は git の対象外）。
+# 機能は ../Library（DemoFeature）。動画は ../videos（gitignore。fetch-videos.sh で ~/Downloads/sample から入れる）から、アプリの中に入る。
+name: CourtDemo
+options:
+  bundleIdPrefix: dev.akidon0000.samples
+  deploymentTarget:
+    iOS: "18.0"
+settings:
+  base:
+    SWIFT_VERSION: "5"
+    CODE_SIGNING_ALLOWED: NO
+    GENERATE_INFOPLIST_FILE: YES
+packages:
+  DemoLibrary:
+    path: ../Library
+targets:
+  CourtDemo:
+    type: application
+    platform: iOS
+    sources:
+      - path: App
+      - path: ../videos
+        optional: true
+        buildPhase: resources
+    dependencies:
+      - package: DemoLibrary
+        product: DemoFeature
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.akidon0000.samples.CourtDemo
+        TARGETED_DEVICE_FAMILY: "1"
