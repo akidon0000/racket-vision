@@ -23,8 +23,8 @@ let package = Package(
         .testTarget(name: "CourtFitTests", dependencies: ["CourtFit"]),
         // 球の追跡。全画素を回すので、CourtFit と同じく Debug でも最適化する。
         .target(name: "BallTracking", swiftSettings: [.unsafeFlags(["-O"], .when(configuration: .debug))]),
-        // テスト用の共通の部品（動画を順に読む、画像と動画を書き出す）。ライブラリとしては出さない。
-        .target(name: "VideoTestSupport"),
-        .testTarget(name: "BallTrackingTests", dependencies: ["BallTracking", "VideoTestSupport"])
+        // テスト用の共通の部品（動画を順に読む、画像と動画を書き出す、コートの矩形を残して読む）。ライブラリとしては出さない。
+        .target(name: "VideoTestSupport", dependencies: ["CourtFit"]),
+        .testTarget(name: "BallTrackingTests", dependencies: ["BallTracking", "VideoTestSupport", "CourtFit"])
     ]
 )

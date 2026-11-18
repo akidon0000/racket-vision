@@ -9,6 +9,9 @@ struct BallCandidate: Equatable {
 }
 
 /// 動いていて、球の色をしていて、球の大きさの塊を探す。
+///
+/// 動いた画素は球の縁だけになりやすい（遅い球は、前のフレームの球と重なる）。動いた画素を種にして、
+/// 色でつながる球の全体を取る。
 struct BallCandidateFinder {
     struct Result {
         var candidates: [BallCandidate]
@@ -17,12 +20,16 @@ struct BallCandidateFinder {
     }
 
     var color = BallColor.yellowGreen
+    /// 追っている球の、見込みの位置の近くを探すときの色（ぶれて薄く写った球も通す）。
+    var trackingColor = BallColor.yellowGreenWide
     /// 球の直径の範囲（映像の幅に対する割合）。
     var diameterRange: ClosedRange<Double> = 0.002...0.02
     /// 動いた画素の割合がこれを超えたら、場面の切り替わりとみなして候補を出さない。
     var sceneChangeRatio = 0.2
     /// 「動いた」とみなす、青・緑・赤の差の合計。
     var differenceThreshold = 45
+    /// 見込みの位置の近くを探すときの、「動いた」とみなす差の合計。
+    var trackingDifferenceThreshold = 25
     /// 塊の長い辺が、短い辺の何倍まで許すか（ぶれて伸びた球を通す）。
     var maximumElongation = 3.0
     /// 塊が、囲む四角形を埋める割合の下限。
@@ -32,10 +39,53 @@ struct BallCandidateFinder {
     func find(current: FrameImage, previous: FrameImage, beforePrevious: FrameImage) -> Result {
         let ratio = movingRatio(current: current, previous: previous)
         guard ratio <= sceneChangeRatio else { return Result(candidates: [], movingRatio: ratio) }
-        var mask = [Bool](repeating: false, count: current.width * current.height)
-        let seeds = fillMask(&mask, current: current, previous: previous, beforePrevious: beforePrevious)
-        let blobs = BallBlob.collect(from: &mask, seeds: seeds, width: current.width, height: current.height)
-        return Result(candidates: blobs.compactMap { candidate(from: $0, imageWidth: current.width) }, movingRatio: ratio)
+        let seeds = movingSeeds(current: current, previous: previous, beforePrevious: beforePrevious)
+        var fill = BallColorFill(
+            image: current, color: color, x: 0, y: 0, width: current.width, height: current.height,
+            limit: sizeLimit(imageWidth: current.width)
+        )
+        var candidates = [BallCandidate]()
+        for seed in seeds {
+            if let blob = fill.blob(atX: seed % current.width, y: seed / current.width),
+               let candidate = candidate(from: blob, imageWidth: current.width) {
+                candidates.append(candidate)
+            }
+        }
+        return Result(candidates: candidates, movingRatio: ratio)
+    }
+
+    /// 追っている球の、見込みの位置 `center` のまわり（縦横に `reach` 画素）だけを、緩い条件で探す。
+    /// 1 つ前のフレームから少しでも動いていて、`trackingColor` の塊を返す。2 枚は同じ大きさであること。
+    func findNear(center: SIMD2<Double>, reach: Double, current: FrameImage, previous: FrameImage) -> [BallCandidate] {
+        let minX = max(0, Int(center.x - reach))
+        let maxX = min(current.width - 1, Int(center.x + reach))
+        let minY = max(0, Int(center.y - reach))
+        let maxY = min(current.height - 1, Int(center.y + reach))
+        guard minX <= maxX, minY <= maxY else { return [] }
+        var fill = BallColorFill(
+            image: current, color: trackingColor, x: minX, y: minY, width: maxX - minX + 1, height: maxY - minY + 1,
+            limit: sizeLimit(imageWidth: current.width)
+        )
+        var candidates = [BallCandidate]()
+        current.bytes.withUnsafeBufferPointer { now in
+            previous.bytes.withUnsafeBufferPointer { before in
+                for y in minY...maxY {
+                    for x in minX...maxX {
+                        let offset = (y * current.width + x) * 4
+                        guard difference(now, before, at: offset) > trackingDifferenceThreshold,
+                              let blob = fill.blob(atX: x, y: y),
+                              let candidate = candidate(from: blob, imageWidth: current.width) else { continue }
+                        candidates.append(candidate)
+                    }
+                }
+            }
+        }
+        return candidates
+    }
+
+    /// 塊の縦横の上限（画素）。これを超える塊は、球ではない。
+    private func sizeLimit(imageWidth: Int) -> Int {
+        Int(diameterRange.upperBound * Double(imageWidth) * maximumElongation) + 1
     }
 
     private func movingRatio(current: FrameImage, previous: FrameImage) -> Double {
@@ -56,8 +106,8 @@ struct BallCandidateFinder {
         return sampled == 0 ? 0 : Double(moved) / Double(sampled)
     }
 
-    /// 1 つ前とも 2 つ前とも違い、球の色をしている画素を立てる。立てた画素の番号を返す。
-    private func fillMask(_ mask: inout [Bool], current: FrameImage, previous: FrameImage, beforePrevious: FrameImage) -> [Int] {
+    /// 1 つ前とも 2 つ前とも違い、球の色をしている画素の番号を返す。
+    private func movingSeeds(current: FrameImage, previous: FrameImage, beforePrevious: FrameImage) -> [Int] {
         var seeds = [Int]()
         current.bytes.withUnsafeBufferPointer { now in
             previous.bytes.withUnsafeBufferPointer { before in
@@ -68,7 +118,6 @@ struct BallCandidateFinder {
                         guard difference(now, before, at: offset) > differenceThreshold,
                               color.matches(red: now[offset + 2], green: now[offset + 1], blue: now[offset]),
                               difference(now, older, at: offset) > differenceThreshold else { continue }
-                        mask[index] = true
                         seeds.append(index)
                     }
                 }

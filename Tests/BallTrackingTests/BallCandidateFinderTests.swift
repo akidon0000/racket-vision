@@ -59,4 +59,56 @@ struct BallCandidateFinderTests {
         let result = find(sequence)
         #expect(result.candidates.isEmpty)
     }
+
+    @Test func findsWholeBallWhenItMovesSlowly() throws {
+        // 半径 6 の球が、1 フレームに 2 画素だけ動く。動いた画素は縁だけだが、色でつながる球の全体を取る。
+        let sequence = (0..<3).map { index in
+            var frame = SyntheticFrame()
+            frame.fillCircle(centerX: 196 + 2 * Double(index), centerY: 100, radius: 6, color: .ball)
+            return frame
+        }
+        let result = find(sequence)
+        let candidate = try #require(result.candidates.first)
+        #expect(result.candidates.count == 1)
+        #expect(simd_distance(candidate.center, SIMD2(200, 100)) <= 0.5)
+        #expect(abs(candidate.radius - 6) <= 0.5)
+    }
+
+    @Test func ignoresBallColoredSpotOnLargeBallColoredThing() {
+        // 黄色い服（止まっている）の上で、球の色のまま少しだけ明るさが変わる（しわ、影）。服の全体につながるので、球にしない。
+        let flicker = SyntheticColor(red: 160, green: 180, blue: 60)
+        let result = find(movingBall { frame, index in
+            frame.fillRect(x: 400, y: 150, width: 80, height: 80, color: .ball)
+            if index == 2 {
+                frame.fillCircle(centerX: 440, centerY: 190, radius: 4, color: flicker)
+            }
+        })
+        #expect(result.candidates.count == 1)
+    }
+
+    /// 薄く写った球（`yellowGreen` には入らず、`yellowGreenWide` には入る色）。
+    private let faintBall = SyntheticColor(red: 140, green: 160, blue: 100)
+
+    @Test func findsFaintBallNearGivenPosition() throws {
+        var previous = SyntheticFrame()
+        previous.fillCircle(centerX: 196, centerY: 100, radius: 4, color: faintBall)
+        var current = SyntheticFrame()
+        current.fillCircle(centerX: 200, centerY: 100, radius: 4, color: faintBall)
+        let finder = BallCandidateFinder()
+        // 画面の全体から探すときの条件（色）では、候補にならない。
+        #expect(finder.find(current: current.image, previous: previous.image, beforePrevious: previous.image).candidates.isEmpty)
+        let near = finder.findNear(center: SIMD2(204, 100), reach: 20, current: current.image, previous: previous.image)
+        let candidate = try #require(near.first)
+        #expect(near.count == 1)
+        #expect(simd_distance(candidate.center, SIMD2(200, 100)) <= 0.5)
+        // 窓の外は探さない。
+        #expect(finder.findNear(center: SIMD2(300, 100), reach: 20, current: current.image, previous: previous.image).isEmpty)
+    }
+
+    @Test func findNearIgnoresStillThings() {
+        var frame = SyntheticFrame()
+        frame.fillCircle(centerX: 200, centerY: 100, radius: 4, color: .ball)
+        let near = BallCandidateFinder().findNear(center: SIMD2(200, 100), reach: 20, current: frame.image, previous: frame.image)
+        #expect(near.isEmpty)
+    }
 }

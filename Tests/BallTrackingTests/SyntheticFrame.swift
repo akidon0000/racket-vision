@@ -13,6 +13,8 @@ struct SyntheticColor {
     /// 黄緑の球。
     static let ball = SyntheticColor(red: 210, green: 230, blue: 80)
     static let gray = SyntheticColor(red: 120, green: 120, blue: 120)
+    /// オレンジの球。
+    static let orangeBall = SyntheticColor(red: 204, green: 94, blue: 57)
 }
 
 /// 合成したフレーム（1 色の背景に、円や四角を置く）。座標は画素で、左上が原点。

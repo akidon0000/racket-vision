@@ -4,7 +4,11 @@
 // 指定したときだけ動く。
 // 出力: <動画>.json（フレームごとの球の位置）、<動画>-<秒>s.jpg（0.5 秒ごと、軌跡の点つき）、report.md（動画ごとの集計）。
 // BALL_VIDEOS（例: 1min-01,1min-04）で動画を絞る。BALL_RENDER_VIDEO=1 で、点を描いた動画 <動画>-ball.mp4 も書く。
+// BALL_COURT=1 で、アプリと同じ追従のコートの検出で、球を探す範囲を決める。コートの検出は遅いので、
+// BALL_COURT_CACHE（フォルダ）を指定すると、フレームごとの矩形を <動画>-court.json に残し、次からはそれを読む。
+// BALL_COLOR（yellow_green、orange、white）で、球の色（`BallColorSet`）を変える。
 import CoreGraphics
+import CourtFit
 import Foundation
 import Testing
 import VideoTestSupport
@@ -41,11 +45,20 @@ private func measureBalls(in video: URL, reportDirectory: URL, rendersVideo: Boo
     if rendersVideo {
         writer = try VideoFrameWriter(url: reportDirectory.appendingPathComponent("\(name)-ball.mp4"), width: width, height: height)
     }
-    let detector = MotionColorBallDetector()
+    // BALL_COLOR（yellow_green、orange、white）で球の色を変える。
+    let detector = MotionColorBallDetector(
+        colors: ProcessInfo.processInfo.environment["BALL_COLOR"].flatMap(BallColorSet.init(name:)) ?? .yellowGreen
+    )
+    let usesCourt = ProcessInfo.processInfo.environment["BALL_COURT"] == "1"
+    var court = CourtQuadSource(video: name, cacheDirectory: ProcessInfo.processInfo.environment["BALL_COURT_CACHE"])
     var rally = BallRallyTrajectory()
     var exports = [BallFrameExport]()
     var nextPreview = 0.0
     while let frame = reader.next() {
+        if usesCourt {
+            // 矩形が見つからないフレームは、範囲で絞らない（nil）。
+            detector.setCourtRegion(court.next(in: frame.pixelBuffer))
+        }
         let outcome = detector.detect(in: frame.pixelBuffer, at: frame.seconds)
         rally.append(outcome)
         exports.append(BallFrameExport(video: name, outcome: outcome, rally: rally.rallyIndex))
@@ -60,6 +73,7 @@ private func measureBalls(in video: URL, reportDirectory: URL, rendersVideo: Boo
         try writer?.append(preview, at: frame.seconds)
     }
     await writer?.finish()
+    try court.save()
     let encoder = JSONEncoder()
     encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
     try encoder.encode(exports).write(to: reportDirectory.appendingPathComponent("\(name).json"))
