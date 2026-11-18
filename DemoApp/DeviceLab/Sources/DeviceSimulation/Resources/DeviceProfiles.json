@@ -1,0 +1,54 @@
+[
+  {
+    "id": "iPhone18,1",
+    "name": "iPhone 17 Pro",
+    "os": "27.3",
+    "latency": { "court": 30, "ball": 4, "pose": 50 },
+    "jitter": 0.4,
+    "maximumWidth": 3840,
+    "maximumHeight": 2160,
+    "maximumFrameRate": 120,
+    "thermalSlowdownPerMinute": 0.01,
+    "source": "measured",
+    "note": "骨格は実機のデモ（Debug ビルド）で 1min-01 を流して測った（28〜85 ms、中央 50 ms 前後、2026-11-16）。コートと球は、まだ測っていない（コートはシミュレーターの表示 30 ms、球は Mac の値から見込んだ）"
+  },
+  {
+    "id": "iPhone15,4",
+    "name": "iPhone 15",
+    "os": "26.0",
+    "latency": { "court": 45, "ball": 6, "pose": 80 },
+    "jitter": 0.4,
+    "maximumWidth": 3840,
+    "maximumHeight": 2160,
+    "maximumFrameRate": 60,
+    "thermalSlowdownPerMinute": 0.02,
+    "source": "estimated",
+    "note": "A16。iPhone 17 Pro（A19 Pro）の 1.5〜1.6 倍の時間と見込んだ（CPU と Neural Engine の公開されている性能の比から）"
+  },
+  {
+    "id": "iPhone14,6",
+    "name": "iPhone SE（第 3 世代）",
+    "os": "18.0",
+    "latency": { "court": 60, "ball": 8, "pose": 110 },
+    "jitter": 0.5,
+    "maximumWidth": 3840,
+    "maximumHeight": 2160,
+    "maximumFrameRate": 60,
+    "thermalSlowdownPerMinute": 0.04,
+    "source": "estimated",
+    "note": "A15。iPhone 17 Pro の 2 倍前後の時間と見込んだ。熱で遅くなりやすい（筐体が小さい）とみて、熱の割合を大きくした"
+  },
+  {
+    "id": "iPhone13,2",
+    "name": "iPhone 12",
+    "os": "18.0",
+    "latency": { "court": 75, "ball": 10, "pose": 140 },
+    "jitter": 0.5,
+    "maximumWidth": 3840,
+    "maximumHeight": 2160,
+    "maximumFrameRate": 60,
+    "thermalSlowdownPerMinute": 0.03,
+    "source": "estimated",
+    "note": "A14。iPhone 17 Pro の 2.5 倍前後の時間と見込んだ。デモが動く最も古い OS（iOS 18）"
+  }
+]
