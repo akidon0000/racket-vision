@@ -20,7 +20,7 @@ let package = Package(
         .target(name: "CourtFit", swiftSettings: [.unsafeFlags(["-O"], .when(configuration: .debug))]),
         // 検出の線を映像の上に描く（iOS の画面の部品）。
         .target(name: "CourtOverlay", dependencies: ["CourtFit"]),
-        .testTarget(name: "CourtFitTests", dependencies: ["CourtFit"]),
+        .testTarget(name: "CourtFitTests", dependencies: ["CourtFit", "VideoTestSupport"]),
         // 球の追跡。全画素を回すので、CourtFit と同じく Debug でも最適化する。
         .target(name: "BallTracking", swiftSettings: [.unsafeFlags(["-O"], .when(configuration: .debug))]),
         // テスト用の共通の部品（動画を順に読む、画像と動画を書き出す、コートの矩形を残して読む）。ライブラリとしては出さない。
