@@ -14,7 +14,8 @@ let package = Package(
         .library(name: "CourtOverlay", targets: ["CourtOverlay"]),
         .library(name: "BallTracking", targets: ["BallTracking"]),
         .library(name: "PlayerPose", targets: ["PlayerPose"]),
-        .library(name: "CourtScene", targets: ["CourtScene"])
+        .library(name: "CourtScene", targets: ["CourtScene"]),
+        .library(name: "SceneAdvisor", targets: ["SceneAdvisor"])
     ],
     targets: [
         // コートの検出。画素を 1 つずつ回す計算が多く、最適化なし（Debug）では 1 フレームに数秒かかる。
@@ -33,6 +34,9 @@ let package = Package(
         .testTarget(name: "PlayerPoseTests", dependencies: ["PlayerPose", "VideoTestSupport", "CourtFit"]),
         // 解析の結果（コート、選手、球）を、コートの 3D の座標に置く。
         .target(name: "CourtScene", dependencies: ["CourtFit", "PlayerPose", "BallTracking"]),
-        .testTarget(name: "CourtSceneTests", dependencies: ["CourtScene", "CourtFit", "PlayerPose", "BallTracking"])
+        .testTarget(name: "CourtSceneTests", dependencies: ["CourtScene", "CourtFit", "PlayerPose", "BallTracking"]),
+        // 外部のモデル（TypeSafe AI の Jev）に映像の 1 枚を見せて、検出の設定（球の色、拾う線の色）を選ぶ。試作。
+        .target(name: "SceneAdvisor", dependencies: ["BallTracking", "CourtFit"]),
+        .testTarget(name: "SceneAdvisorTests", dependencies: ["SceneAdvisor", "BallTracking", "CourtFit", "VideoTestSupport"])
     ]
 )
