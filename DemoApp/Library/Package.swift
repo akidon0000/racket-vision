@@ -7,10 +7,14 @@ import PackageDescription
 let package = Package(
     name: "DemoLibrary",
     platforms: [
-        .iOS(.v18)
+        .iOS(.v18),
+        // 3D のシミュレーションなどの部品は、Mac のアプリ（DeviceLab）でも使う。
+        .macOS(.v15)
     ],
     products: [
-        .library(name: "DemoFeature", targets: ["DemoFeature"])
+        .library(name: "DemoFeature", targets: ["DemoFeature"]),
+        // Mac のアプリ（DeviceLab）でも使う、3D のシミュレーションの部品。
+        .library(name: "CourtSceneView", targets: ["CourtSceneView"])
     ],
     dependencies: [
         .package(path: "../..")
@@ -28,14 +32,34 @@ let package = Package(
             dependencies: [.product(name: "BallTracking", package: "racket-vision")],
             swiftSettings: [.swiftLanguageMode(.v5)]
         ),
-        // 動画を流しながら、コートの検出の枠と、球の軌跡の点を重ねる
+        // 選手の骨格を描く部品
+        .target(
+            name: "PlayerPoseOverlay",
+            dependencies: [.product(name: "PlayerPose", package: "racket-vision")],
+            swiftSettings: [.swiftLanguageMode(.v5)]
+        ),
+        // 解析の結果を 3D で描く部品（iOS と macOS）
+        .target(
+            name: "CourtSceneView",
+            dependencies: [
+                .product(name: "CourtScene", package: "racket-vision"),
+                .product(name: "PlayerPose", package: "racket-vision"),
+                .product(name: "BallTracking", package: "racket-vision"),
+                .product(name: "CourtFit", package: "racket-vision")
+            ],
+            swiftSettings: [.swiftLanguageMode(.v5)]
+        ),
+        // 動画を流しながら、コートの検出の枠と、球の軌跡の点と、選手の骨格を重ねる
         .target(
             name: "VideoPlayback",
             dependencies: [
                 "CourtLineOverlay",
                 "BallTrackOverlay",
+                "PlayerPoseOverlay",
+                "CourtSceneView",
                 .product(name: "CourtFit", package: "racket-vision"),
-                .product(name: "BallTracking", package: "racket-vision")
+                .product(name: "BallTracking", package: "racket-vision"),
+                .product(name: "PlayerPose", package: "racket-vision")
             ],
             swiftSettings: [.swiftLanguageMode(.v5)]
         ),

@@ -5,10 +5,14 @@ import CoreVideo
 import CourtFit
 import QuartzCore
 import CourtLineOverlay
+import CourtSceneView
+import PlayerPose
+import PlayerPoseOverlay
 import SwiftUI
 import UIKit
 
-/// 動画を流し、コートの検出の結果を枠で、球の軌跡を点で重ねる。
+/// 縦画面で、上に動画を流し、下に検出の結果（コート、選手の骨格、球の軌跡）だけを白い背景の 3D で描く。
+/// 下は、ドラッグで視点をコートの中心のまわりに回せる。最初の視点は映像のカメラの位置なので、上の動画と見比べられる。
 public struct PlayerView: View {
     @StateObject private var model: PlayerModel
     @Environment(\.dismiss) private var dismiss
@@ -18,46 +22,62 @@ public struct PlayerView: View {
     }
 
     public var body: some View {
-        GeometryReader { proxy in
-            let rect = fitRect(container: proxy.size, video: model.videoSize)
+        VStack(spacing: 0) {
             ZStack {
                 Color.black
                 PlayerLayerView(player: model.player)
-                QuadsOverlay(quads: model.quads, rect: rect)
-                BallDotsOverlay(samples: model.ballSamples, rallyIndex: model.rallyIndex, rect: rect)
+            }
+            .overlay(alignment: .topLeading) { closeButton }
+            Divider()
+            CourtSceneView(
+                corners: model.quads.first?.corners, imageSize: model.videoSize, players: model.players,
+                ballSamples: model.ballSamples, rallyIndex: model.rallyIndex
+            )
+            .overlay(alignment: .bottom) {
+                Text(statusText)
+                    .font(.caption2.monospaced())
+                    .padding(6)
+                    .background(.black.opacity(0.06), in: RoundedRectangle(cornerRadius: 6))
+                    .foregroundStyle(.black)
+                    .padding(.bottom, 8)
             }
         }
-        // 画面いっぱいに出す（安全領域の外まで、黒い背景と映像を広げる）。
-        .ignoresSafeArea()
-        .overlay(alignment: .topLeading) {
-            Button {
-                dismiss()
-            } label: {
-                Image(systemName: "xmark")
-                    .font(.headline)
-                    .foregroundStyle(.white)
-                    .padding(12)
-                    .background(.black.opacity(0.6), in: Circle())
+        .background {
+            VStack(spacing: 0) {
+                Color.black
+                Color.white
             }
-            .padding(.leading, 16)
-            .padding(.top, 8)
-        }
-        .overlay(alignment: .bottom) {
-            Text(statusText)
-                .font(.footnote.monospaced())
-                .padding(8)
-                .background(.black.opacity(0.6), in: RoundedRectangle(cornerRadius: 8))
-                .foregroundStyle(.white)
-                .padding(.bottom, 24)
+            .ignoresSafeArea()
         }
         .toolbar(.hidden, for: .navigationBar)
         .task { await model.load() }
         .onDisappear { model.stop() }
     }
 
+    private var closeButton: some View {
+        Button {
+            dismiss()
+        } label: {
+            Image(systemName: "xmark")
+                .font(.headline)
+                .foregroundStyle(.white)
+                .padding(12)
+                .background(.black.opacity(0.6), in: Circle())
+        }
+        .padding(.leading, 16)
+        .padding(.top, 8)
+    }
+
+    private var playerText: String {
+        if model.usesRecordedPlayers {
+            return "選手 \(model.players.count) 人（記録）"
+        }
+        return model.playerFailure == nil ? "選手 \(model.players.count) 人" : "選手 検出不可"
+    }
+
     private var statusText: String {
-        let found = model.quads.isEmpty ? "検出なし" : "検出あり"
-        let ball = "球 \(model.ballSamples.count) 点（ラリー \(model.rallyIndex + 1)）"
+        let found = model.quads.isEmpty ? "コートなし" : "コートあり"
+        let ball = "球 \(model.ballSamples.count) 点（ラリー \(model.rallyIndex + 1)）  \(playerText)"
         guard let milliseconds = model.milliseconds else { return "\(found)  \(ball)" }
         return String(format: "%@  %.1f ms  %@", found, milliseconds, ball)
     }
@@ -87,7 +107,8 @@ final class PlayerUIView: UIView {
 }
 
 /// 検出の結果を持つ、動画の再生の状態。画面の更新のたびに新しいフレームを取り、球の追跡にかける。
-/// コートの検出には、0.2 秒ごとにかける。どちらも、前の検出が終わるまで次はかけない（間に合わないフレームは飛ばす）。
+/// コートの検出には 0.2 秒ごと、選手の骨格の検出には 0.1 秒ごとにかける。どれも、前の検出が終わるまで次はかけない
+/// （間に合わないフレームは飛ばす）。
 @MainActor
 final class PlayerModel: ObservableObject {
     let player: AVPlayer
@@ -97,6 +118,12 @@ final class PlayerModel: ObservableObject {
     /// 今のラリーの、球の軌跡。
     @Published private(set) var ballSamples: [BallSample] = []
     @Published private(set) var rallyIndex = 0
+    /// コートにいる選手（番号の順）。
+    @Published private(set) var players: [CourtPlayer] = []
+    /// 骨格の検出が動かなかったときの理由。動いていれば nil。
+    @Published private(set) var playerFailure: String?
+    /// その場の検出の代わりに、前もって求めた記録（`RecordedPlayers`）を出しているか。
+    @Published private(set) var usesRecordedPlayers = false
 
     private let item: AVPlayerItem
     private let output: AVPlayerItemVideoOutput
@@ -105,14 +132,23 @@ final class PlayerModel: ObservableObject {
         switches: CourtMethodSwitches(enabled: [.lineModelTracking])
     )
     private let ballDetector = MotionColorBallDetector()
+    private let playerDetector = CourtPlayerDetector()
+    /// 前もって求めた選手の検出の記録。その場の検出が動かないとき（シミュレーター）に使う。
+    private let recordedPlayers: RecordedPlayers?
     private var rally = BallRallyTrajectory()
     private var displayLink: CADisplayLink?
     private var isAnalyzing = false
+    /// 検出 1 回の時間。10 秒ごとに、ログへ出す。
+    private var timings = DetectionTimings()
+    private var lastTimingLog: CFTimeInterval = 0
     private var isTrackingBall = false
+    private var isTrackingPlayers = false
     private var lastCourtSample: CFTimeInterval = 0
+    private var lastPlayerSample: CFTimeInterval = 0
 
     init(url: URL) {
         item = AVPlayerItem(url: url)
+        recordedPlayers = RecordedPlayers(video: url)
         output = AVPlayerItemVideoOutput(pixelBufferAttributes: [
             kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA
         ])
@@ -145,7 +181,24 @@ final class PlayerModel: ObservableObject {
               let buffer = output.copyPixelBuffer(forItemTime: time, itemTimeForDisplay: nil) else { return }
         let box = PixelBufferBox(buffer: buffer)
         trackBall(in: box, seconds: time.seconds)
+        if usesRecordedPlayers, let recordedPlayers {
+            players = recordedPlayers.players(at: time.seconds)
+        } else {
+            trackPlayers(in: box, seconds: time.seconds)
+        }
         analyzeCourt(in: box)
+    }
+
+    private func trackPlayers(in box: PixelBufferBox, seconds: Double) {
+        let now = CACurrentMediaTime()
+        guard !isTrackingPlayers, now - lastPlayerSample >= 0.1 else { return }
+        lastPlayerSample = now
+        isTrackingPlayers = true
+        let detector = playerDetector
+        Task.detached(priority: .userInitiated) {
+            let outcome = detector.detect(in: box.buffer, at: seconds)
+            await MainActor.run { [weak self] in self?.show(outcome) }
+        }
     }
 
     private func trackBall(in box: PixelBufferBox, seconds: Double) {
@@ -173,12 +226,58 @@ final class PlayerModel: ObservableObject {
 
     private func show(_ outcome: DetectionOutcome?) {
         isAnalyzing = false
+        if let outcome {
+            timings.addCourt(outcome.durationMilliseconds)
+        }
+        logTimings()
         quads = outcome?.quads ?? []
         milliseconds = outcome?.durationMilliseconds
+        // 球は、見つかったコートの矩形の中（少し外まで）だけで探す。矩形が無いときは、範囲で絞らない。
+        ballDetector.setCourtRegion(quads.first?.corners)
+        // 選手は、コートの中かその近くに立つ人だけを選ぶ。矩形が無いときは、大きく写った人から選ぶ。
+        playerDetector.setCourt(quads.first?.corners)
+    }
+
+    private func show(_ outcome: CourtPlayersOutcome) {
+        isTrackingPlayers = false
+        if outcome.failure == nil {
+            timings.addPose(outcome.durationMilliseconds)
+        }
+        players = outcome.players
+        playerFailure = outcome.failure
+        // その場の検出が動かない（シミュレーター）ときは、記録があれば、そちらに切り替える。
+        if outcome.failure != nil, recordedPlayers != nil {
+            usesRecordedPlayers = true
+        }
+        logPlayers(outcome)
+    }
+
+    private var lastPlayerLog: CFTimeInterval = 0
+
+    /// 10 秒ごとに、検出 1 回の時間のまとめ（再生を始めてからの全部）をログに出す。
+    private func logTimings() {
+        let now = CACurrentMediaTime()
+        guard now - lastTimingLog >= 10 else { return }
+        lastTimingLog = now
+        NSLog("%@", timings.summary)
+    }
+
+    /// 1 秒ごとに、選手の数と番号をログに出す（画面を見られない実機で、検出が動いているかを確かめるため）。
+    private func logPlayers(_ outcome: CourtPlayersOutcome) {
+        let now = CACurrentMediaTime()
+        guard now - lastPlayerLog >= 1 else { return }
+        lastPlayerLog = now
+        let ids = outcome.players.map { "\($0.id)\($0.isDetected ? "" : "?")" }.joined(separator: ",")
+        // NSLog は、端末のログ（Console、log show）にも出る。print は、つないだコンソールにしか出ない。
+        NSLog("%@", String(
+            format: "[PlayerPose] t=%.1f players=%ld ids=[%@] poses=%ld %.0fms failure=%@",
+            outcome.time, outcome.players.count, ids, outcome.poses.count, outcome.durationMilliseconds, outcome.failure ?? "-"
+        ))
     }
 
     private func show(_ outcome: BallFrameOutcome) {
         isTrackingBall = false
+        timings.addBall(outcome.durationMilliseconds)
         rally.append(outcome)
         ballSamples = rally.samples
         rallyIndex = rally.rallyIndex

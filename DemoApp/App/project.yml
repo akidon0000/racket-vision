@@ -29,4 +29,6 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: dev.akidon0000.samples.CourtDemo
         TARGETED_DEVICE_FAMILY: "1"
+        # 縦画面だけで使う。端末を横にしても、画面は回さない。横長の動画も、縦画面の上半分に収めて流す。
+        INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone: UIInterfaceOrientationPortrait
         INFOPLIST_KEY_NSCameraUsageDescription: "コートの検出を試すために、カメラの映像を使います（撮影した映像は保存しません）。"

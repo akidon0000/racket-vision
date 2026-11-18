@@ -6,9 +6,8 @@ import SwiftUI
 struct CourtDemoApp: App {
     var body: some Scene {
         WindowGroup {
-            NavigationStack {
-                VideoListView()
-            }
+            // 画面の行き来（NavigationStack）は、VideoListView が持つ。
+            VideoListView()
         }
     }
 }
