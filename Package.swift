@@ -12,7 +12,8 @@ let package = Package(
     products: [
         .library(name: "CourtFit", targets: ["CourtFit"]),
         .library(name: "CourtOverlay", targets: ["CourtOverlay"]),
-        .library(name: "BallTracking", targets: ["BallTracking"])
+        .library(name: "BallTracking", targets: ["BallTracking"]),
+        .library(name: "PlayerPose", targets: ["PlayerPose"])
     ],
     targets: [
         // コートの検出。画素を 1 つずつ回す計算が多く、最適化なし（Debug）では 1 フレームに数秒かかる。
@@ -25,6 +26,9 @@ let package = Package(
         .target(name: "BallTracking", swiftSettings: [.unsafeFlags(["-O"], .when(configuration: .debug))]),
         // テスト用の共通の部品（動画を順に読む、画像と動画を書き出す、コートの矩形を残して読む）。ライブラリとしては出さない。
         .target(name: "VideoTestSupport", dependencies: ["CourtFit"]),
-        .testTarget(name: "BallTrackingTests", dependencies: ["BallTracking", "VideoTestSupport", "CourtFit"])
+        .testTarget(name: "BallTrackingTests", dependencies: ["BallTracking", "VideoTestSupport", "CourtFit"]),
+        // 選手の骨格の検出と、コートにいる選手の特定。
+        .target(name: "PlayerPose"),
+        .testTarget(name: "PlayerPoseTests", dependencies: ["PlayerPose", "VideoTestSupport", "CourtFit"])
     ]
 )

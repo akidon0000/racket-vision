@@ -1,6 +1,10 @@
-# 骨格分析（未実装）
+# 骨格分析
 
-選手の骨格（関節の位置）を推定する機能の精度を測って直すときに読む。2026-11-15 時点で、機能も測る仕組みもまだ無い。最初に手を付けるときは、コートの検出（[court.md](court.md)）と同じ形で、測る仕組みから作る。
+選手の骨格（関節の位置）を推定し、コートにいる選手を特定する機能（`PlayerPose`）の精度を測って直すときに読む。
+
+2026-11-16 時点の状態: `CourtPlayerDetector`（Vision の骨格検出を範囲を絞ってかけ、選手を選んで追う）と、測る仕組み `reportsPlayersOnDemoVideos`（`Tests/PlayerPoseTests/DemoVideoPlayerReportTests.swift`）がある。測り方と結果は [docs/accuracy/pose.md](../../../docs/accuracy/pose.md)。関節の正解（下の表の `Tests/PoseAnnotations`）と PCK は、まだ無い。
+
+以下は、最初に書いた計画。
 
 ## 作るもの
 
