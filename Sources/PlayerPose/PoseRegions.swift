@@ -1,4 +1,5 @@
 import CoreGraphics
+import CourtFit
 
 /// 骨格の検出をかける範囲を、コートの矩形から作る。
 ///

@@ -20,22 +20,10 @@ let package = Package(
         .package(path: "../..")
     ],
     targets: [
-        // 枠を描く部品と、表示の範囲の計算（動画とカメラで共通）
+        // 映像に検出したコートの線を重ねる部品と、映像の表示の範囲の計算（動画とカメラで共通）
         .target(
             name: "CourtLineOverlay",
             dependencies: [.product(name: "CourtFit", package: "racket-vision")],
-            swiftSettings: [.swiftLanguageMode(.v5)]
-        ),
-        // 球の軌跡の点を描く部品
-        .target(
-            name: "BallTrackOverlay",
-            dependencies: [.product(name: "BallTracking", package: "racket-vision")],
-            swiftSettings: [.swiftLanguageMode(.v5)]
-        ),
-        // 選手の骨格を描く部品
-        .target(
-            name: "PlayerPoseOverlay",
-            dependencies: [.product(name: "PlayerPose", package: "racket-vision")],
             swiftSettings: [.swiftLanguageMode(.v5)]
         ),
         // 解析の結果を 3D で描く部品（iOS と macOS）
@@ -49,13 +37,11 @@ let package = Package(
             ],
             swiftSettings: [.swiftLanguageMode(.v5)]
         ),
-        // 動画を流しながら、コートの検出の枠と、球の軌跡の点と、選手の骨格を重ねる
+        // 動画を流しながら、映像にコートの線を重ね、検出の結果（コート、球の軌跡、選手の骨格）を 3D で描く
         .target(
             name: "VideoPlayback",
             dependencies: [
                 "CourtLineOverlay",
-                "BallTrackOverlay",
-                "PlayerPoseOverlay",
                 "CourtSceneView",
                 .product(name: "CourtFit", package: "racket-vision"),
                 .product(name: "BallTracking", package: "racket-vision"),
@@ -68,7 +54,6 @@ let package = Package(
             name: "CameraDetection",
             dependencies: [
                 "CourtLineOverlay",
-                "PlayerPoseOverlay",
                 "CourtSceneView",
                 .product(name: "CourtFit", package: "racket-vision"),
                 .product(name: "BallTracking", package: "racket-vision"),

@@ -1,4 +1,5 @@
 import CoreGraphics
+import CourtFit
 import simd
 
 /// 選手かもしれない人 1 人（骨格と、追跡に使う量）。

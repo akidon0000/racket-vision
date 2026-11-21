@@ -2554,7 +2554,7 @@ Expected: `$W/score/summary.md` と、29 本ぶんの `<動画>-score.md`
 
 - [ ] **Step 2: 材料をためて採点するようにする**
 
-`PlayerView.swift` の先頭の `import PlayerPoseOverlay` の後に `import PlayScoring` を足す。
+`PlayerView.swift` の先頭の `import CourtSceneView` の後に `import PlayScoring` を足す。
 
 `PlayerModel` の `@Published private(set) var usesRecordedPlayers = false` の後に足す:
 

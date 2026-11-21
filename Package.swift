@@ -30,7 +30,7 @@ let package = Package(
         .target(name: "VideoTestSupport", dependencies: ["CourtFit"]),
         .testTarget(name: "BallTrackingTests", dependencies: ["BallTracking", "VideoTestSupport", "CourtFit"]),
         // 選手の骨格の検出と、コートにいる選手の特定。
-        .target(name: "PlayerPose"),
+        .target(name: "PlayerPose", dependencies: ["CourtFit"]),
         .testTarget(name: "PlayerPoseTests", dependencies: ["PlayerPose", "VideoTestSupport", "CourtFit"]),
         // 解析の結果（コート、選手、球）を、コートの 3D の座標に置く。
         .target(name: "CourtScene", dependencies: ["CourtFit", "PlayerPose", "BallTracking"]),

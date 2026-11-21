@@ -1,4 +1,4 @@
-import PlayerPose
+import CourtFit
 import SwiftUI
 
 /// 検出したコートの四隅から、コートの線（外周、キッチンの線、センターライン、ネット）を描く。

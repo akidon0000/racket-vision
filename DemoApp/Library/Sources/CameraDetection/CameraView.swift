@@ -5,7 +5,6 @@ import CourtFit
 import CourtLineOverlay
 import CourtSceneView
 import PlayerPose
-import PlayerPoseOverlay
 import SwiftUI
 import UIKit
 

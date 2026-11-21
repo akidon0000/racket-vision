@@ -1,4 +1,5 @@
 import CoreGraphics
+import CourtFit
 import PlayerPose
 
 /// 立っている人の骨格を作る。`foot` は足元（正規化座標、左下が原点）、`height` は身長（正規化座標の縦の長さ）。

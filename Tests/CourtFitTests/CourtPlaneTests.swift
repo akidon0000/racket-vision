@@ -1,5 +1,5 @@
 import CoreGraphics
-import PlayerPose
+import CourtFit
 import Testing
 
 struct CourtPlaneTests {
