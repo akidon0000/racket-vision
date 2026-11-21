@@ -11,21 +11,36 @@ import PlayerPoseOverlay
 import SwiftUI
 import UIKit
 
-/// 縦画面で、上に動画を流し、下に検出の結果（コート、選手の骨格、球の軌跡）だけを白い背景の 3D で描く。
-/// 下は、ドラッグで視点をコートの中心のまわりに回せる。最初の視点は映像のカメラの位置なので、上の動画と見比べられる。
+/// 動画を流し、映像の上に検出したコートの線を赤で重ね、検出の結果（コート、選手の骨格、球の軌跡、映像のカメラ）を白い背景の 3D で描く。縦画面では上に動画、下に 3D、
+/// 横画面では左に動画、右に 3D を並べる。
+/// 3D は、ドラッグで視点をコートの中心のまわりに回せる。最初の視点は映像のカメラの位置なので、動画と見比べられる。
 public struct PlayerView: View {
     @StateObject private var model: PlayerModel
     @Environment(\.dismiss) private var dismiss
+    /// 縦の幅が狭い（iPhone の横画面）か。
+    @Environment(\.verticalSizeClass) private var verticalSizeClass
 
     public init(url: URL) {
         _model = StateObject(wrappedValue: PlayerModel(url: url))
     }
 
+    /// 動画と 3D の並べ方。横画面なら左右、縦画面なら上下。
+    private var layout: AnyLayout {
+        verticalSizeClass == .compact ? AnyLayout(HStackLayout(spacing: 0)) : AnyLayout(VStackLayout(spacing: 0))
+    }
+
     public var body: some View {
-        VStack(spacing: 0) {
+        layout {
             ZStack {
                 Color.black
                 PlayerLayerView(player: model.player)
+                // 検出したコートの線を、映像の上に赤で重ねる（映像は縦横比を保って枠に収めている）。
+                GeometryReader { proxy in
+                    CourtLinesOverlay(
+                        corners: model.quads.first?.corners, rect: fitRect(container: proxy.size, video: model.videoSize),
+                        color: .red, lineWidth: 3
+                    )
+                }
             }
             .overlay(alignment: .topLeading) { closeButton }
             Divider()
@@ -43,7 +58,7 @@ public struct PlayerView: View {
             }
         }
         .background {
-            VStack(spacing: 0) {
+            layout {
                 Color.black
                 Color.white
             }
@@ -98,7 +113,7 @@ struct PlayerLayerView: UIViewRepresentable {
 }
 
 final class PlayerUIView: UIView {
-    override class var layerClass: AnyClass { AVPlayerLayer.self }
+    override static var layerClass: AnyClass { AVPlayerLayer.self }
 
     var playerLayer: AVPlayerLayer {
         // layerClass で AVPlayerLayer を指定しているので、必ず AVPlayerLayer になる。

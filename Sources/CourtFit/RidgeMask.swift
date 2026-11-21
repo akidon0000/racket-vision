@@ -294,31 +294,60 @@ struct RidgeMask {
     /// 観客席や看板の文字のように芯が細かく散らばっている場所は、どこに線を引いても近くに芯があるので、両脇で弾く。
     /// 画面の中に 3 割も入っていない線は数えない。
     func supportedLineCount(of matrix: simd_double3x3, model: CourtModel) -> Int {
-        CourtModel.lines.filter { line in
+        CourtModel.lines.filter { isLineSupported($0, matrix: matrix, model: model) }.count
+    }
+
+    /// 図面の線のうち 1 本が見えているか（`supportedLineCount` と同じ決め方）。
+    func isLineSupported(_ line: CourtLine, matrix: simd_double3x3, model: CourtModel) -> Bool {
+        let start = model.position(of: line.start)
+        let end = model.position(of: line.end)
+        let points = 30
+        let pixels = (0..<points).map { index -> SIMD2<Double>? in
+            let court = start + (end - start) * (Double(index) / Double(points - 1))
+            let value = matrix * SIMD3(court.x, court.y, 1)
+            return value.z > 1e-9 ? SIMD2(value.x / value.z, value.y / value.z) : nil
+        }
+        var inside = 0
+        var hits = 0
+        var cleanHits = 0
+        for index in pixels.indices {
+            guard let pixel = pixels[index], isInside(pixel) else { continue }
+            inside += 1
+            guard value(dilated[1], at: pixel) else { continue }
+            hits += 1
+            let neighbor = pixels[index < points - 1 ? index + 1 : index - 1]
+            if let neighbor, hasClearSides(at: pixel, along: neighbor - pixel) {
+                cleanHits += 1
+            }
+        }
+        return Double(inside) >= 0.3 * Double(points) && Double(hits) >= 0.5 * Double(inside)
+            && Double(cleanHits) >= 0.25 * Double(inside)
+    }
+
+    /// 図面の線の上に芯がある割合を、画面の上の長さで重みを付けて測る（0〜1）。画面の中に何も写らなければ nil。
+    /// 手前の線は長く写るので、手前の線が見えないことを重く数える。奥の詰まった線や、ネットに隠れた線は軽い。
+    func lengthWeightedSupport(of matrix: simd_double3x3, model: CourtModel) -> Double? {
+        let points = 30
+        var inside = 0.0
+        var hits = 0.0
+        for line in CourtModel.lines {
             let start = model.position(of: line.start)
             let end = model.position(of: line.end)
-            let points = 30
             let pixels = (0..<points).map { index -> SIMD2<Double>? in
                 let court = start + (end - start) * (Double(index) / Double(points - 1))
                 let value = matrix * SIMD3(court.x, court.y, 1)
                 return value.z > 1e-9 ? SIMD2(value.x / value.z, value.y / value.z) : nil
             }
-            var inside = 0
-            var hits = 0
-            var cleanHits = 0
-            for index in pixels.indices {
-                guard let pixel = pixels[index], isInside(pixel) else { continue }
-                inside += 1
-                guard value(dilated[1], at: pixel) else { continue }
-                hits += 1
-                let neighbor = pixels[index < points - 1 ? index + 1 : index - 1]
-                if let neighbor, hasClearSides(at: pixel, along: neighbor - pixel) {
-                    cleanHits += 1
+            for index in 0..<(points - 1) {
+                guard let pixel = pixels[index], let next = pixels[index + 1], isInside(pixel), isInside(next) else { continue }
+                let length = simd_length(next - pixel)
+                inside += length
+                if value(dilated[1], at: pixel) {
+                    hits += length
                 }
             }
-            return Double(inside) >= 0.3 * Double(points) && Double(hits) >= 0.5 * Double(inside)
-                && Double(cleanHits) >= 0.25 * Double(inside)
-        }.count
+        }
+        return inside > 0 ? hits / inside : nil
     }
 
     private func isInside(_ pixel: SIMD2<Double>) -> Bool {

@@ -1,0 +1,12 @@
+name: racket-vision
+version: 1.0.0
+description: APM project for racket-vision
+author: akihiro-matsuyama
+targets:
+- cursor
+- claude
+- codex
+dependencies:
+  apm: []
+includes: auto
+scripts: {}

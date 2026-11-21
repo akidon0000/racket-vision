@@ -3,7 +3,7 @@
 import PackageDescription
 
 // 機種ごとの再現（DeviceLab）。iPhone の機種と OS の条件で、デモと同じ処理を Mac で流す。
-// 設計は docs/superpowers/specs/2026-11-16-device-lab-design.md。macOS アプリの殻は App/（xcodegen）。
+// 設計は Docs/superpowers/specs/2026-11-16-device-lab-design.md。macOS アプリの殻は App/（xcodegen）。
 let package = Package(
     name: "DeviceLab",
     platforms: [

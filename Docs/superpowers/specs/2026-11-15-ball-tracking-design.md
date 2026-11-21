@@ -79,7 +79,7 @@ BallRallyPalette.color(forRally: rally.rallyIndex) // 今のラリーの色（�
 | 5. 追跡 | 追跡中なら、前の位置と速さから次の位置を見込み、近い候補を選ぶ。無ければ、見込みの位置の近くだけを緩い条件（薄い色、小さな動き）で探し直す。それも無ければ、向きが変わったとみて、少し広い範囲の候補へ移る。追跡が無ければ、候補から仮の軌跡を始め、続けてつながって球の速さで動いたものを球として出し始める | 1 フレームだけ光った誤り、同じ場所でちらつく黄色、ゆっくり動くもの |
 | 6. 見失い | 候補が無い時間が続いたら追跡を捨てる（球が選手やネットに隠れた、画面から出た）。見失っているあいだに、別の仮の軌跡が球と言えるようになったら、そちらへ移る | — |
 
-段 5 と 6 の「続けて」「続いたら」は、フレームの数ではなく秒で決める。サンプル動画は毎秒 30 コマと 60 コマが混じっているためである。最初の値は、球として出し始めるまでが 0.08 秒、見失ってから追跡を捨てるまでが 0.3 秒。サンプル動画で測って直し、直した値と理由を `docs/accuracy/ball.md` に残す。大きさの範囲は映像の幅に対する割合で持つ。切り出したフレームを拡大して目で測った球の直径は、1min-04 で約 18px、1min-01 で約 8px（どちらも幅 1920px）で、0.2〜2% の範囲に入る。
+段 5 と 6 の「続けて」「続いたら」は、フレームの数ではなく秒で決める。サンプル動画は毎秒 30 コマと 60 コマが混じっているためである。最初の値は、球として出し始めるまでが 0.08 秒、見失ってから追跡を捨てるまでが 0.3 秒。サンプル動画で測って直し、直した値と理由を `Docs/accuracy/ball.md` に残す。大きさの範囲は映像の幅に対する割合で持つ。切り出したフレームを拡大して目で測った球の直径は、1min-04 で約 18px、1min-01 で約 8px（どちらも幅 1920px）で、0.2〜2% の範囲に入る。
 
 ## 作らないもの
 
@@ -100,7 +100,7 @@ BallRallyPalette.color(forRally: rally.rallyIndex) // 今のラリーの色（�
 | 速さ | Release ビルドで、1080p の 1 フレームあたりの平均処理時間を測る。目標は 20ms 以下（この Mac。実機では未計測のままになる） |
 | `DemoApp` | シミュレーターで動画を流し、球に点が付くこと、ラリーが終わると点が消えることを画面で見る |
 
-結果は `docs/accuracy/ball.md` に、動画ごとの数と、目で見て分かった外れ・見逃しを書く。測る手順は `skills/improve-vision-accuracy/references/ball.md` に足す。
+結果は `Docs/accuracy/ball.md` に、動画ごとの数と、目で見て分かった外れ・見逃しを書く。測る手順は `.apm/skills/improve-vision-accuracy/references/ball.md` に足す。
 
 ## 分かっている限界
 
@@ -121,8 +121,8 @@ BallRallyPalette.color(forRally: rally.rallyIndex) // 今のラリーの色（�
 | `Tests/BallTrackingTests/` | 新設 |
 | `DemoApp/Library/Package.swift`、`DemoApp/Library/Sources/BallTrackOverlay/` | 点を描く部品を新設 |
 | `DemoApp/Library/Sources/VideoPlayback/PlayerView.swift` | フレームを毎回取って球を追い、点を重ねる。コートの検出は今までどおり 0.2 秒ごと |
-| `docs/accuracy/ball.md`、`skills/improve-vision-accuracy/references/ball.md` | 新設 |
-| `README.md`、`skills/improve-vision-accuracy/SKILL.md` | モジュールの表と、対象の表に 1 行ずつ足す |
+| `Docs/accuracy/ball.md`、`.apm/skills/improve-vision-accuracy/references/ball.md` | 新設 |
+| `README.md`、`.apm/skills/improve-vision-accuracy/SKILL.md` | モジュールの表と、対象の表に 1 行ずつ足す |
 
 ## 根拠
 

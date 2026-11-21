@@ -8,7 +8,7 @@
 
 **Tech Stack:** Swift 6.2（ルートのパッケージは Swift 6 の言語モード）、CoreVideo、simd、AVFoundation（テストと DemoApp だけ）、Swift Testing、SwiftUI（DemoApp だけ）。外部への依存は足さない。
 
-**Spec:** `docs/superpowers/specs/2026-11-15-ball-tracking-design.md`
+**Spec:** `Docs/superpowers/specs/2026-11-15-ball-tracking-design.md`
 
 ## Global Constraints
 
@@ -267,7 +267,7 @@ Expected: どちらもエラーなし。`swiftformat` がファイルを直し�
 - [ ] **Step 8: コミット**
 
 ```bash
-git add Package.swift Sources/BallTracking Tests/BallTrackingTests docs/superpowers
+git add Package.swift Sources/BallTracking Tests/BallTrackingTests Docs/superpowers
 git commit -m "球の追跡のライブラリ（BallTracking）の土台と、球の色の判定を足す
 
 Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>"
@@ -1837,7 +1837,7 @@ Expected: ビルドが通り、テストは「skipped」になる。
 `OUT` はセッションの一時フォルダ（scratchpad）の中に作る。
 
 ```bash
-COURT_DEMO_DIR=$PWD/DemoApp/videos BALL_REPORT_DIR=$OUT/ball BALL_VIDEOS=1min-04 BALL_RENDER_VIDEO=1 \
+COURT_DEMO_DIR=$PWD/DemoApp/SamplePlayVideos/FullLength BALL_REPORT_DIR=$OUT/ball BALL_VIDEOS=1min-04 BALL_RENDER_VIDEO=1 \
   xcrun swift test -c release -Xswiftc -enable-testing --filter reportsBallsOnDemoVideos
 ```
 
@@ -1862,9 +1862,9 @@ Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>"
 ### Task 7: サンプル動画 13 本で測り、記録する
 
 **Files:**
-- Create: `docs/accuracy/ball.md`
-- Create: `skills/improve-vision-accuracy/references/ball.md`
-- Modify: `skills/improve-vision-accuracy/SKILL.md`（対象の表）
+- Create: `Docs/accuracy/ball.md`
+- Create: `.apm/skills/improve-vision-accuracy/references/ball.md`
+- Modify: `.apm/skills/improve-vision-accuracy/SKILL.md`（対象の表）
 - Modify: `README.md`（冒頭の文と、モジュールの表、「測る」）
 
 **Interfaces:**
@@ -1875,12 +1875,12 @@ Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>"
 
 - [ ] **Step 1: スキルを読む**
 
-`skills/improve-vision-accuracy/SKILL.md` を読み、「測る・見る・比べる」の手順に従う。
+`.apm/skills/improve-vision-accuracy/SKILL.md` を読み、「測る・見る・比べる」の手順に従う。
 
 - [ ] **Step 2: 13 本を全部測る**
 
 ```bash
-COURT_DEMO_DIR=$PWD/DemoApp/videos BALL_REPORT_DIR=$OUT/ball-all \
+COURT_DEMO_DIR=$PWD/DemoApp/SamplePlayVideos/FullLength BALL_REPORT_DIR=$OUT/ball-all \
   xcrun swift test -c release -Xswiftc -enable-testing --filter reportsBallsOnDemoVideos
 ```
 
@@ -1889,7 +1889,7 @@ Expected: PASS。`$OUT/ball-all/report.md` に 13 行の表ができる。数分
 - [ ] **Step 3: 画像を並べて目で見る**
 
 ```bash
-xcrun swiftc -O skills/improve-vision-accuracy/scripts/contact_sheet.swift -o $OUT/contact_sheet
+xcrun swiftc -O .apm/skills/improve-vision-accuracy/scripts/contact_sheet.swift -o $OUT/contact_sheet
 for n in 01 02 03 04 05 06 07 08 09 10 11 12 13; do
   $OUT/contact_sheet $OUT/sheet-$n.jpg 6 320 $(ls $OUT/ball-all/pickleball-play-demo-1min-$n-*.jpg | sort | head -60)
 done
@@ -1909,7 +1909,7 @@ done
 当たりの多い動画と、少ない動画を 1 本ずつ選び、点を描いた動画を書き出す（`<a>`、`<b>` は選んだ動画の番号）。
 
 ```bash
-COURT_DEMO_DIR=$PWD/DemoApp/videos BALL_REPORT_DIR=$OUT/ball-video BALL_VIDEOS=1min-<a>,1min-<b> BALL_RENDER_VIDEO=1 \
+COURT_DEMO_DIR=$PWD/DemoApp/SamplePlayVideos/FullLength BALL_REPORT_DIR=$OUT/ball-video BALL_VIDEOS=1min-<a>,1min-<b> BALL_RENDER_VIDEO=1 \
   xcrun swift test -c release -Xswiftc -enable-testing --filter reportsBallsOnDemoVideos
 ```
 
@@ -1917,7 +1917,7 @@ Expected: `$OUT/ball-video/` に mp4 が 2 本できる。
 
 - [ ] **Step 5: 記録を書く**
 
-`docs/accuracy/ball.md` を、`docs/accuracy/court.md` と同じ形で書く。節と、入れる中身は次のとおり。数と秒は、Step 2 の `report.md` と Step 3 の書き留めから写す。
+`Docs/accuracy/ball.md` を、`Docs/accuracy/court.md` と同じ形で書く。節と、入れる中身は次のとおり。数と秒は、Step 2 の `report.md` と Step 3 の書き留めから写す。
 
 ```markdown
 # 球の追跡の精度
@@ -1960,7 +1960,7 @@ Expected: `$OUT/ball-video/` に mp4 が 2 本できる。
 
 - [ ] **Step 6: 測る手順を書く**
 
-`skills/improve-vision-accuracy/references/ball.md`:
+`.apm/skills/improve-vision-accuracy/references/ball.md`:
 
 ```markdown
 # 球の追跡
@@ -2017,7 +2017,7 @@ Expected: `$OUT/ball-video/` に mp4 が 2 本できる。
 
 - [ ] **Step 7: スキルと README の表に足す**
 
-`skills/improve-vision-accuracy/SKILL.md` の対象の表に、1 行足す（「骨格分析」の行の前）。
+`.apm/skills/improve-vision-accuracy/SKILL.md` の対象の表に、1 行足す（「骨格分析」の行の前）。
 
 ```markdown
 | 球の追跡（`BallTracking`） | 実装済み。全フレームの書き出しがある。正解はまだ無い | [references/ball.md](references/ball.md) |
@@ -2051,13 +2051,13 @@ rally.samples                                      // 今のラリーの軌跡�
 BallRallyPalette.color(forRally: rally.rallyIndex) // 今のラリーの色
 ```
 
-球の追跡の仕組みと、サンプル動画での結果は [docs/accuracy/ball.md](docs/accuracy/ball.md) にある。
+球の追跡の仕組みと、サンプル動画での結果は [Docs/accuracy/ball.md](Docs/accuracy/ball.md) にある。
 ````
 
 - [ ] **Step 8: コミット**
 
 ```bash
-git add docs/accuracy/ball.md skills/improve-vision-accuracy README.md
+git add Docs/accuracy/ball.md .apm/skills/improve-vision-accuracy README.md
 git commit -m "球の追跡をサンプル動画 13 本で測った結果と、測る手順を残す
 
 Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>"
@@ -2326,10 +2326,10 @@ Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>"
 
 - [ ] **Step 8: 記録に、DemoApp で確かめた結果を足す**
 
-`docs/accuracy/ball.md` の「確かめていないこと」から DemoApp の項目を外し、「記録」の最後に、シミュレーターで見た結果（どの動画で、点がどう出たか、評価用の書き出しと比べて取りこぼしが増えたか）を 2〜3 文で足す。
+`Docs/accuracy/ball.md` の「確かめていないこと」から DemoApp の項目を外し、「記録」の最後に、シミュレーターで見た結果（どの動画で、点がどう出たか、評価用の書き出しと比べて取りこぼしが増えたか）を 2〜3 文で足す。
 
 ```bash
-git add docs/accuracy/ball.md
+git add Docs/accuracy/ball.md
 git commit -m "球の追跡を DemoApp で確かめた結果を、記録に足す
 
 Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>"

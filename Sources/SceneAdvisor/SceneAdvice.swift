@@ -4,7 +4,7 @@ import CourtFit
 /// 1 枚の絵から Jev に聞いた、場面の見立て（コートが写っているか、球の色、コートの線の色）。
 ///
 /// 位置を細かく出すのは Jev の苦手なこと（コートの 4 隅は幅の 2% 以上ずれた）。種類を見分けるのは得意なので、
-/// 検出の設定（球の色、拾う線の色）を選ぶのに使う。確かめた結果は docs/accuracy/scene-advice.md。
+/// 検出の設定（球の色、拾う線の色）を選ぶのに使う。確かめた結果は Docs/accuracy/scene-advice.md。
 public struct SceneAdvice: Equatable, Sendable {
     /// コートが写っている確からしさ（0〜1）。
     public var courtVisible: Double

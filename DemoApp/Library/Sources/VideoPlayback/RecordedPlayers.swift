@@ -6,7 +6,7 @@ import PlayerPose
 ///
 /// iOS のシミュレーターでは、Vision の骨格検出が動かない。そこで、その場の検出が動かないときは、この記録を
 /// 再生の時刻に合わせて出す。記録は、`reportsPlayersOnDemoVideos`（`Tests/PlayerPoseTests`）が書き出す JSON を、
-/// 名前を変えて置いたもの。手順は `docs/accuracy/pose.md`。
+/// 名前を変えて置いたもの。手順は `Docs/accuracy/pose.md`。
 struct RecordedPlayers {
     /// 記録の 1 フレーム（書き出しの JSON の、読むところだけ）。
     private struct Frame: Decodable {

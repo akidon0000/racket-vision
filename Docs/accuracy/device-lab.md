@@ -2,7 +2,7 @@
 
 - 読み手: DeviceLab と 3D のシミュレーションを直す人（エージェントを含む）
 - 目的: 機種ごとの再現と 3D の表示が、何をどこまで再現できているかを残す。直したら、下の「記録」に追記する
-- 設計: [docs/superpowers/specs/2026-11-16-device-lab-design.md](../superpowers/specs/2026-11-16-device-lab-design.md)
+- 設計: [Docs/superpowers/specs/2026-11-16-device-lab-design.md](../superpowers/specs/2026-11-16-device-lab-design.md)
 
 ## 結論（2026-11-16）
 
@@ -28,7 +28,7 @@ cd DemoApp/DeviceLab/App && xcodegen generate && open DeviceLab.xcodeproj   # Xc
 数だけを出すときは、テストで流す。
 
 ```bash
-cd DemoApp/DeviceLab && DEVICE_LAB_VIDEO=$PWD/../videos/pickleball-play-demo-1min-01.mp4 \
+cd DemoApp/DeviceLab && DEVICE_LAB_VIDEO=$PWD/../SamplePlayVideos/FullLength/pickleball-play-demo-1min-01.mp4 \
   swift test -c release -Xswiftc -enable-testing --filter runsDemoVideoOnEachDevice
 ```
 
@@ -38,7 +38,7 @@ cd DemoApp/DeviceLab && DEVICE_LAB_VIDEO=$PWD/../videos/pickleball-play-demo-1mi
 
 ## 3D のシミュレーション
 
-デモ（iPhone）と DeviceLab（Mac）の下の段を、RealityKit の 3D にした。ドラッグで、視点がコートの中心のまわりを回る。ピンチで近づく・離れる。最初の視点は、映像のカメラの位置で、「元の視点」で戻せる。
+デモ（iPhone）と DeviceLab（Mac）の下の段を、RealityKit の 3D にした。ドラッグで、視点がコートの中心のまわりを回る。ピンチで近づく・離れる。最初の視点は、映像のカメラの後ろの斜め上で、カメラの印（黒い箱、写している範囲の青い 4 本の線、地面からの柱）とコートが見える。「カメラの視点」で映像のカメラの位置に、「全体」で最初の視点に戻せる（2026-11-20 に変えた。それまでは、最初の視点が映像のカメラの位置で、カメラの印は見えなかった）。
 
 | もの | 置き方 | 確かめたこと |
 | --- | --- | --- |

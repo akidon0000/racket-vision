@@ -38,6 +38,23 @@ public struct SceneOrbit: Equatable {
         clamp()
     }
 
+    /// 映像のカメラの後ろの斜め上から、カメラとコートの両方を見る視点。カメラと同じ向きから、上がって下がる。
+    ///
+    /// 視点はコートの中心を向くので、カメラが画面の下の端より内に入るよう、カメラの 2 倍強の距離まで下がる
+    /// （カメラが中心から 10 m、高さ 1.5 m なら、22 m 下がって 34 度の高さから見る。カメラは画面の中心から 19 度下に写る）。
+    public init(overviewOf camera: CourtCamera) {
+        let position = camera.position
+        let distance = simd_length(position)
+        let elevation = asin(min(1, max(-1, position.y / max(distance, 1e-6))))
+        self.init(
+            azimuth: atan2(position.x, position.z),
+            elevation: min(elevation + 0.45, 1.1),
+            distance: max(distance * 2.2, distance + 10),
+            fieldOfView: 1.1
+        )
+        clamp()
+    }
+
     /// 最初の視点（コートを手前の斜め上から見る）。映像のカメラが分からないときに使う。
     public static let standard = SceneOrbit(azimuth: 0, elevation: 0.5, distance: 22, fieldOfView: 1.2)
 

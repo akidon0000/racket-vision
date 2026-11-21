@@ -1,5 +1,7 @@
 excluded:
   - .build/
+  - DemoApp/Library/.build/
+  - DemoApp/DeviceLab/.build/
 opt_in_rules:
   - array_init
   - closure_end_indentation

@@ -1,24 +1,34 @@
 import AVFoundation
+import BallTracking
 import CoreVideo
 import CourtFit
-import SwiftUI
 import CourtLineOverlay
+import CourtSceneView
+import PlayerPose
+import PlayerPoseOverlay
+import SwiftUI
 import UIKit
 
-/// カメラの映像に、コートの検出の枠を重ねる。映像は保存せず、その場で検出して表示する。
+/// カメラの映像に、コートの検出の枠を重ねる。あわせて、球の追跡と選手の骨格の検出もかけ、右下に小さく 3D で描く。
+/// 映像は保存せず、その場で検出して表示する。
 public struct CameraView: View {
     public init() {}
 
     @StateObject private var model = CameraModel()
     @Environment(\.dismiss) private var dismiss
+    /// ピンチを始めたときのズームの倍率。
+    @State private var pinchStart: Double?
 
     public var body: some View {
         GeometryReader { proxy in
             ZStack {
                 Color.black
                 if model.isAvailable {
-                    CameraPreviewView(session: model.session)
-                    QuadsOverlay(quads: model.quads, rect: fillRect(container: proxy.size, video: model.videoSize))
+                    CameraPreviewView(session: model.session, device: model.device, output: model.output)
+                    CourtLinesOverlay(
+                        corners: model.quads.first?.corners, rect: fillRect(container: proxy.size, video: model.videoSize),
+                        color: .red, lineWidth: 3
+                    )
                 } else {
                     Text(model.message)
                         .foregroundStyle(.white)
@@ -27,6 +37,20 @@ public struct CameraView: View {
                 }
             }
             .clipped()
+            .contentShape(Rectangle())
+            .gesture(pinch)
+            .overlay(alignment: .bottomTrailing) {
+                if model.isAvailable {
+                    scene(container: proxy.size)
+                }
+            }
+            .overlay(alignment: .bottomLeading) {
+                if model.isAvailable {
+                    cameraControls
+                        .padding(.leading, 16)
+                        .padding(.bottom, 32)
+                }
+            }
         }
         .ignoresSafeArea()
         .overlay(alignment: .topLeading) {
@@ -42,14 +66,14 @@ public struct CameraView: View {
             .padding(.leading, 16)
             .padding(.top, 8)
         }
-        .overlay(alignment: .bottom) {
+        .overlay(alignment: .top) {
             if model.isAvailable {
                 Text(statusText)
-                    .font(.footnote.monospaced())
-                    .padding(8)
-                    .background(.black.opacity(0.6), in: RoundedRectangle(cornerRadius: 8))
+                    .font(.caption2.monospaced())
+                    .padding(6)
+                    .background(.black.opacity(0.6), in: RoundedRectangle(cornerRadius: 6))
                     .foregroundStyle(.white)
-                    .padding(.bottom, 24)
+                    .padding(.top, 14)
             }
         }
         .toolbar(.hidden, for: .navigationBar)
@@ -57,115 +81,71 @@ public struct CameraView: View {
         .onDisappear { model.stop() }
     }
 
+    /// 左下の操作。外カメラとインカメの切り替えと、ズームの倍率（0.5× の超広角など、そのカメラで選べるもの）。
+    private var cameraControls: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 6) {
+                ForEach(model.zoomPresets, id: \.self) { preset in
+                    Button {
+                        model.setZoom(preset)
+                    } label: {
+                        Text(CameraModel.zoomText(preset))
+                            .font(.caption.bold().monospacedDigit())
+                            .foregroundStyle(isCurrent(preset) ? .yellow : .white)
+                            .frame(minWidth: 38, minHeight: 38)
+                            .background(.black.opacity(0.6), in: Circle())
+                    }
+                    .accessibilityLabel("ズーム \(CameraModel.zoomText(preset))")
+                }
+            }
+            Button {
+                model.switchCamera()
+            } label: {
+                Label(model.position == .front ? "外カメラへ" : "インカメへ", systemImage: "arrow.triangle.2.circlepath.camera")
+                    .font(.caption.bold())
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .background(.black.opacity(0.6), in: Capsule())
+            }
+            .disabled(model.isSwitching)
+        }
+    }
+
+    private func isCurrent(_ preset: Double) -> Bool {
+        abs(model.zoom - preset) < 0.05
+    }
+
+    /// ピンチで、ズームの倍率を連続に変える。
+    private var pinch: some Gesture {
+        MagnifyGesture()
+            .onChanged { value in
+                let start = pinchStart ?? model.zoom
+                pinchStart = start
+                model.setZoom(start * value.magnification)
+            }
+            .onEnded { _ in pinchStart = nil }
+    }
+
+    /// 右下の小さな 3D（コート、選手の骨格、球）。画面の短い辺の 45% の幅。
+    private func scene(container: CGSize) -> some View {
+        let width = min(container.width, container.height) * 0.45
+        return CourtSceneView(
+            corners: model.quads.first?.corners, imageSize: model.videoSize, players: model.players,
+            ballSamples: model.ballSamples, rallyIndex: model.rallyIndex, showsControls: false, showsLiveBallInitially: true
+        )
+        .frame(width: width, height: width * 1.2)
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .overlay(RoundedRectangle(cornerRadius: 12).stroke(.white.opacity(0.8), lineWidth: 1))
+        .shadow(radius: 4)
+        .padding(.trailing, 16)
+        .padding(.bottom, 32)
+    }
+
     private var statusText: String {
-        let found = model.quads.isEmpty ? "検出なし" : "検出あり"
-        return String(format: "%@  %.1f ms", found, model.milliseconds)
-    }
-}
-
-/// カメラの状態と、検出の結果。権限が無い、カメラが無いときは、理由を出す。
-@MainActor
-final class CameraModel: ObservableObject {
-    let session = AVCaptureSession()
-    @Published private(set) var quads: [DetectedQuad] = []
-    @Published private(set) var milliseconds: Double = 0
-    @Published private(set) var videoSize: CGSize = .zero
-    @Published private(set) var isAvailable = true
-    @Published private(set) var message = ""
-
-    private let output = AVCaptureVideoDataOutput()
-    private var analyzer: FrameAnalyzer?
-
-    func start() async {
-        guard await AVCaptureDevice.requestAccess(for: .video) else {
-            isAvailable = false
-            message = "カメラの使用が許可されていません。設定アプリで、このアプリのカメラを許可してください。"
-            return
-        }
-        guard let device = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back),
-              let input = try? AVCaptureDeviceInput(device: device) else {
-            isAvailable = false
-            message = "カメラが見つかりません（シミュレーターにはカメラがありません。実機で開いてください）。"
-            return
-        }
-        session.beginConfiguration()
-        session.sessionPreset = .high
-        if session.canAddInput(input) { session.addInput(input) }
-        // 検出が追いつかないフレームは捨てる（映像を止めないため）。
-        output.alwaysDiscardsLateVideoFrames = true
-        output.videoSettings = [kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA]
-        let analyzer = FrameAnalyzer { [weak self] result in
-            Task { @MainActor in self?.show(result) }
-        }
-        self.analyzer = analyzer
-        output.setSampleBufferDelegate(analyzer, queue: DispatchQueue(label: "court-demo.camera"))
-        if session.canAddOutput(output) { session.addOutput(output) }
-        // 縦向きの映像にして、検出の向き（.up）と画面の向きをそろえる。
-        if let connection = output.connection(with: .video), connection.isVideoRotationAngleSupported(90) {
-            connection.videoRotationAngle = 90
-        }
-        session.commitConfiguration()
-        let session = session
-        DispatchQueue.global(qos: .userInitiated).async { session.startRunning() }
-    }
-
-    func stop() {
-        let session = session
-        DispatchQueue.global(qos: .userInitiated).async { session.stopRunning() }
-    }
-
-    private func show(_ result: FrameAnalyzer.Result) {
-        quads = result.quads
-        milliseconds = result.milliseconds
-        videoSize = result.size
-    }
-}
-
-/// カメラのフレームを、コートの検出にかける（撮影の専用の作業の列で動く）。
-final class FrameAnalyzer: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate, @unchecked Sendable {
-    struct Result: Sendable {
-        let quads: [DetectedQuad]
-        let milliseconds: Double
-        let size: CGSize
-    }
-
-    private let analyzer = CourtAnalyzer(
-        detectors: [TrackingLineModelCourtRectangleDetector(searchInterval: 0)],
-        switches: CourtMethodSwitches(enabled: [.lineModelTracking])
-    )
-    private let publish: @Sendable (Result) -> Void
-
-    init(publish: @escaping @Sendable (Result) -> Void) {
-        self.publish = publish
-    }
-
-    func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
-        guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return }
-        let outcome = analyzer.analyze(pixelBuffer, orientation: .up).first
-        let size = CGSize(width: CVPixelBufferGetWidth(pixelBuffer), height: CVPixelBufferGetHeight(pixelBuffer))
-        publish(Result(quads: outcome?.quads ?? [], milliseconds: outcome?.durationMilliseconds ?? 0, size: size))
-    }
-}
-
-/// カメラの映像を表示する層。
-struct CameraPreviewView: UIViewRepresentable {
-    let session: AVCaptureSession
-
-    func makeUIView(context: Context) -> CameraPreviewUIView {
-        let view = CameraPreviewUIView()
-        view.previewLayer.session = session
-        view.previewLayer.videoGravity = .resizeAspectFill
-        return view
-    }
-
-    func updateUIView(_ uiView: CameraPreviewUIView, context: Context) {}
-}
-
-final class CameraPreviewUIView: UIView {
-    override class var layerClass: AnyClass { AVCaptureVideoPreviewLayer.self }
-
-    var previewLayer: AVCaptureVideoPreviewLayer {
-        // layerClass で指定しているので、必ず AVCaptureVideoPreviewLayer になる。
-        layer as? AVCaptureVideoPreviewLayer ?? AVCaptureVideoPreviewLayer()
+        let found = model.quads.isEmpty ? "コートなし" : "コートあり"
+        let players = model.playerFailure == nil ? "選手 \(model.players.count) 人" : "選手 検出不可"
+        let camera = "\(model.position == .front ? "イン" : "外") \(CameraModel.zoomText(model.zoom))"
+        return String(format: "%@  %@  %.1f ms  球 %ld 点  %@", camera, found, model.milliseconds, model.ballSamples.count, players)
     }
 }

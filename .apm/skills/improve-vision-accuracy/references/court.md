@@ -50,7 +50,7 @@ TILE_HEIGHT=384 <一時フォルダ>/contact_sheet $OUT/sheet.jpg 10 216 $OUT/re
 
 ## 正解の交点
 
-`Tests/CourtAnnotations/<動画の名前>.json` にある（交点 12 個の画面の位置）。付けた人のずれが 5〜30cm あるので、コートの面で 5cm の合格線はこのデータでは判定できない。画面の上のずれ（px）も一緒に見る。正解を付ける道具は `tools/court-annotator/index.html`（ブラウザで開き、書き出したフレームの画像を読み込んで交点をクリックする）。フレームの画像は `exportsFramesForAnnotation`（`COURT_DEMO_DIR` と `COURT_FRAMES_DIR` を指定）で書き出せる。
+`Tests/CourtAnnotations/<動画の名前>.json` にある（交点 12 個の画面の位置）。付けた人のずれが 5〜30cm あるので、コートの面で 5cm の合格線はこのデータでは判定できない。画面の上のずれ（px）も一緒に見る。正解を付ける道具は `Tools/court-annotator/index.html`（ブラウザで開き、書き出したフレームの画像を読み込んで交点をクリックする）。フレームの画像は `exportsFramesForAnnotation`（`COURT_DEMO_DIR` と `COURT_FRAMES_DIR` を指定）で書き出せる。
 
 ## 線の対応の段
 

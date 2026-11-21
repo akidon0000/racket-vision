@@ -30,13 +30,13 @@
 測り直す手順:
 
 ```bash
-COURT_DEMO_DIR=$PWD/DemoApp/videos POSE_COURT_CACHE=<コートの矩形を残すフォルダ> POSE_REPORT_DIR=<書き出す先> \
+COURT_DEMO_DIR=$PWD/DemoApp/SamplePlayVideos/FullLength POSE_COURT_CACHE=<コートの矩形を残すフォルダ> POSE_REPORT_DIR=<書き出す先> \
   xcrun swift test -c release -Xswiftc -enable-testing --filter reportsPlayersOnDemoVideos
 ```
 
 1 秒に 10 枚かける（`POSE_RATE` で変える）。`POSE_COURT_CACHE` は、球の追跡の `BALL_COURT_CACHE` と同じ形なので、同じフォルダを使える。全 13 本で約 7 分。`POSE_RENDER_VIDEO=1` で、骨格を描いた動画も書く。
 
-Mac でデモを動かすとき: Apple シリコンの Mac では、iOS のアプリをそのまま動かせる（Designed for iPad）。シミュレーターと違って、Vision の検出がその場で動く見込みがある（2026-11-16 時点で、起動までは確かめた。検出が動くかは未確認）。
+Mac でデモを動かすとき: Apple シリコンの Mac では、iOS のアプリをそのまま動かせる（Designed for iPad）。シミュレーターと違って、Vision の骨格検出がその場で動く。2026-11-20 に、20261119-4990 で確かめた（ログに `failure=-`、1 回 24〜60 ms、2 秒目から 4 人）。記録（`.players.json`）がアプリに入っていても、その場の検出が動けば記録は使わない。
 
 ```bash
 xcodebuild -project DemoApp/App/CourtDemo.xcodeproj -scheme CourtDemo \
@@ -44,9 +44,19 @@ xcodebuild -project DemoApp/App/CourtDemo.xcodeproj -scheme CourtDemo \
   -allowProvisioningUpdates CODE_SIGNING_ALLOWED=YES CODE_SIGN_STYLE=Automatic DEVELOPMENT_TEAM=<チーム ID> build
 ```
 
+ビルドしてできる `Debug-iphoneos/CourtDemo.app` は、そのまま `open` すると「実行形式が正しくない」で開けない。App Store の iOS アプリと同じ形（`Wrapper/` の中に入れ、`WrappedBundle` を張る）に包んでから開く。`-autoplay <動画の名前>` で、その動画を開いた状態で始まる。アプリのログ（NSLog）はシステムのログでは伏せ字になるので、`--stderr` でファイルに書かせて読む。
+
+```bash
+M=<置き場>/CourtDemo.app
+mkdir -p $M/Wrapper && /bin/cp -Rf <ビルドの置き場>/Build/Products/Debug-iphoneos/CourtDemo.app $M/Wrapper/ \
+  && ln -sf Wrapper/CourtDemo.app $M/WrappedBundle
+open --stderr <置き場>/stderr.log $M --args -autoplay 20261119-4990
+grep PlayerPose <置き場>/stderr.log   # [PlayerPose] t=2.2 players=4 ids=[0,1,2,3] ... failure=-
+```
+
 できた `Debug-iphoneos/CourtDemo.app` は、そのままでは開けない（「実行ファイルの形式が正しくない」）。インストールされた iOS のアプリと同じ形に包むと開ける: `<置き場>/CourtDemo.app/Wrapper/CourtDemo.app` に入れ、`<置き場>/CourtDemo.app/WrappedBundle` を `Wrapper/CourtDemo.app` への記号リンクにして、`open -n <置き場>/CourtDemo.app --args -autoplay 1min-01`。
 
-シミュレーターでデモを見るとき: シミュレーターでは Vision の骨格検出が動かないので、デモのアプリは、macOS で前もって求めた記録を、再生の時刻に合わせて出す（画面に「選手 N 人（記録）」と出る）。記録は、上の手順で書き出した `<動画>.json` を、`DemoApp/videos/<動画>.players.json` として動画の隣に置き、`xcodegen generate` でアプリに入れる（`DemoApp/videos` は git の対象外）。その場の検出が動く実機では、記録は使わない。
+シミュレーターでデモを見るとき: シミュレーターでは Vision の骨格検出が動かないので、デモのアプリは、macOS で前もって求めた記録を、再生の時刻に合わせて出す（画面に「選手 N 人（記録）」と出る）。記録は、上の手順で書き出した `<動画>.json` を、`DemoApp/SamplePlayVideos/FullLength/<動画>.players.json` として動画の隣に置き、`xcodegen generate` でアプリに入れる（`DemoApp/SamplePlayVideos/FullLength` は git の対象外）。その場の検出が動く実機では、記録は使わない。
 
 ## 記録
 
@@ -88,6 +98,56 @@ xcodebuild -project DemoApp/App/CourtDemo.xcodeproj -scheme CourtDemo \
 | --- | --- |
 | Vision の人の枠の検出（`VNDetectHumanRectanglesRequest`）で選手を探してから骨格をかける | 01・04・12 で、1 人も見つからなかった（選手が小さすぎる） |
 | 番号ごとの服の色を、見つけるたびに置き換える | 取り違えた相手の色にすぐ染まって、取り違えを戻せなかった。ゆっくり覚え直すようにした |
+
+### 2026-11-20 自分たちで撮った動画（2026-11-19、53 本）で、手前の 2 人を測る
+
+撮り方: ベースラインの後ろから、手持ち・目の高さ（約 1.5 m）。隣のコートの選手や、撮る人の横にいる人も写る。切り出しは `DemoApp/Clips/README.md`。
+
+手前の 2 人（番号 0・1）がそのフレームで両方とも見つかった割合。2 つの直しを入れた。
+
+| 版 | 手前の 2 人 | 手前の 1 人以上 | 奥の 2 人 |
+| --- | --- | --- | --- |
+| 直す前 | 67.6% | 89.8% | 66.3% |
+| コートの取り違えを直す（court.md の 2026-11-20） | 71.1% | 91.6% | 67.5% |
+| ＋骨格を探す範囲を直す | 77.5% | 95.1% | 69.3% |
+
+骨格を探す範囲の直し: 手前の半面の範囲は、ベースラインの後ろ（コートの長さの 25%、3.4 m）まで広げていた。低い位置から撮ると、そこがカメラの後ろになって写せず、範囲がネットの近くだけになり、手前の選手を探していなかった。写せるところまで奥へ寄せ、範囲を画面の下の端まで伸ばすようにした（`PoseRegions.band`）。
+
+目で確かめた結果（24 本から 1 枚ずつ、中ほどのフレーム）: 手前の 2 人とも正しい人に番号 0・1 が付いたのは 12 枚、1 人だけ正しいのが 8 枚、どちらも違うか見つからないのが 4 枚。上の割合は「手前の番号が 2 つ出た」かを数えるので、目で見るより高く出る。
+
+残っている外れ方（多い順）:
+
+| 外れ方 | 例 |
+| --- | --- |
+| コートが見つからない、または外れていて、手前の選手を選ばない（骨格は出ているのに番号が付かない） | 4991-1、4992-2、5014-1、5016-1 |
+| 隣のコートの選手や奥の選手に、手前の番号が付く。手前の選手に奥の番号が付く | 4996-1、5001-1、4987-1、5016-2 |
+| コートの線がほぼ見えない低い位置・横からの映像（4984、4985、4993、5005） | 番号の手前・奥が決まらない |
+
+### 2026-11-20 元の動画（2026-11-19、切り出す前の 29 本）で測る
+
+アプリに入れた動画（`DemoApp/SamplePlayVideos/FullLength`）は、元の動画（1080p、約 8.5 Mbps）を 8 Mbps と 5 Mbps で 2 回圧縮し直したもの。元の動画で測り直すと、手前の 2 人がそろう割合は 10 ポイント上がった。今の検出の仕組みは変えていない。
+
+| 入力 | 手前の 2 人 | 手前の 1 人以上 | 奥の 2 人 | 手前の追い直し |
+| --- | --- | --- | --- | --- |
+| アプリの動画（5 Mbps） | 67.5% | 88.0% | 66.7% | 149 回 |
+| 元の動画 | 77.3% | 92.7% | 67.5% | 163 回 |
+
+- 一番上がったのは 5013（46% → 93%）。悪いままなのは 5018（18%）。5018 はコートの中の低い所から縦向きで撮っていて、手前のベースラインが写っていない。
+- 向きの記録がある 5 本（4984、4985、5017、5018、5020）は、計測の部品（`VideoFrameReader`）が読めないので、回して 30 Mbps で書き直した。残りの 24 本は、映像を圧縮し直さずに mp4 へ詰め直した。
+- 元の動画は 29.97 コマ/秒、アプリの動画は 30 コマ/秒。0.1 秒ごとに間引くとき、かけるフレームの数が少し変わる（5013 で 2613 枚 → 2194 枚）。割合の差には、画質のほかにこれも混じる。
+- 上位 5 本（コートが 9 割以上のフレームで見つかり、10 秒以上ある動画を、手前の 2 人の割合で並べた）を、アプリの一覧の一番上に「精度が良い動画」として出す。選び方は `.apm/skills/improve-vision-accuracy/scripts/rank_videos.py`、一覧は `DemoApp/App/App/featured-videos.json`。
+
+| 順位 | 動画 | 手前の 2 人 | 奥の 2 人 | コート |
+| --- | --- | --- | --- | --- |
+| 1 | 5012 | 98% | 80% | 100% |
+| 2 | 5013 | 93% | 62% | 98% |
+| 3 | 4992 | 86% | 83% | 99% |
+| 4 | 4997 | 86% | 79% | 96% |
+| 5 | 5006 | 78% | 71% | 100% |
+
+シミュレーターで出す骨格の記録（`DemoApp/SamplePlayVideos/FullLength/<動画>.players.json`）も、元の動画の結果に差し替えた。
+
+これを受けて、アプリに入れる動画（`DemoApp/SamplePlayVideos/FullLength/20261119-*.mp4`）も元の画質に入れ替えた（`normalize_videos.py` の `for_app`。29 本で 0.9 GB → 2.0 GB）。24 本は計測に使ったものと映像が同じで、向きを回した 5 本は同じ設定で書き直した。シミュレーターで 5012 を流し、コートの線と 4 人の骨格（記録）が出ることを確かめた。
 
 ## 確かめていないこと・分かっている限界
 

@@ -67,7 +67,15 @@ public struct PoseRegions: Sendable {
         var maxX = -Double.infinity
         var minY = Double.infinity
         var maxY = -Double.infinity
-        for depth in [near, far] {
+        // カメラが低くコートに近いと、ベースラインの後ろに広げた先がカメラの後ろになり、写せない。そのときは、写せるところまで
+        // 奥へ寄せ、それより手前は画面の下の端まで続くとみなす（カメラに近いほど、地面は画面の下に写る）。
+        var reachesBottom = false
+        for requested in [near, far] {
+            var depth = requested
+            while depth < far, !isVisible(depth, in: court) {
+                depth = min(far, depth + 0.02)
+                reachesBottom = true
+            }
             guard let left = court.imagePoint(for: CGPoint(x: -sideMargin, y: depth)),
                   let right = court.imagePoint(for: CGPoint(x: 1 + sideMargin, y: depth)),
                   let lineLeft = court.imagePoint(for: CGPoint(x: 0, y: depth)),
@@ -83,10 +91,18 @@ public struct PoseRegions: Sendable {
                 maxY = max(maxY, Double(point.y) + height)
             }
         }
+        if reachesBottom {
+            minY = min(minY, 0)
+        }
         let whole = CGRect(x: 0, y: 0, width: 1, height: 1)
         let rect = CGRect(x: minX, y: minY, width: maxX - minX, height: maxY - minY).intersection(whole)
         guard minX.isFinite, !rect.isNull, rect.width > 0, rect.height > 0 else { return [] }
         return split(rect, aspect: aspect)
+    }
+
+    /// コートの縦 `depth` の線（サイドラインの外まで）が、カメラの前にあって写せるか。
+    private func isVisible(_ depth: Double, in court: CourtPlane) -> Bool {
+        [-sideMargin, 0, 1, 1 + sideMargin].allSatisfy { court.imagePoint(for: CGPoint(x: $0, y: depth)) != nil }
     }
 
     /// 横に長い範囲を、重なりを持たせて左右に分ける。

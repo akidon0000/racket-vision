@@ -1,5 +1,5 @@
 # 機種ごとの再現（DeviceLab）の macOS アプリの殻。xcodegen generate で DeviceLab.xcodeproj を作る（生成物は git の対象外）。
-# 処理は ../（DeviceSimulation）、3D の描画は ../../Library（CourtSceneView）。動画は ../../videos から、アプリの中に入る。
+# 処理は ../（DeviceSimulation）、3D の描画は ../../Library（CourtSceneView）。動画は ../../SamplePlayVideos/FullLength から、アプリの中に入る。
 name: DeviceLab
 options:
   bundleIdPrefix: dev.akidon0000.samples
@@ -23,7 +23,7 @@ targets:
     platform: macOS
     sources:
       - path: Sources
-      - path: ../../videos
+      - path: ../../SamplePlayVideos/FullLength
         optional: true
         buildPhase: resources
     dependencies:

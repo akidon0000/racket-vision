@@ -10,7 +10,7 @@ description: ラケット競技（ピックルボールなど）の映像の解�
 | 対象 | 状態 | 読むもの |
 | --- | --- | --- |
 | コートの検出（`CourtFit`） | 実装済み。測る仕組みもある | [references/court.md](references/court.md) |
-| 骨格分析（選手の姿勢） | 未実装。測る仕組みもまだ無い | [references/pose.md](references/pose.md) |
+| 骨格分析（選手の姿勢、`PlayerPose`） | 実装済み。測る仕組み（`reportsPlayersOnDemoVideos`）もある。関節の正解は無い | [references/pose.md](references/pose.md) |
 
 対象を決めたら、その参照ファイルを先に読む。対象が増えたら、`references/<対象>.md` を足し、上の表に 1 行足す。
 
@@ -73,7 +73,7 @@ description: ラケット競技（ピックルボールなど）の映像の解�
 
 ### 8. 記録する
 
-結果は、パッケージの `docs/accuracy/<対象>.md`（例: `docs/accuracy/court.md`）に追記する。書くのは次のとおり。
+結果は、パッケージの `Docs/accuracy/<対象>.md`（例: `Docs/accuracy/court.md`）に追記する。書くのは次のとおり。
 
 - 何を直したか、なぜか（どの種類の映像で、どの段で落ちていたか）
 - 動画ごとの、直す前と後の数（何を数えたかも書く。「何か返した数」と「正しく当たった数」は違う）

@@ -12,7 +12,12 @@ final class SceneStore {
     let root = Entity()
     let camera = PerspectiveCamera()
 
-    private let videoCamera = ModelEntity()
+    /// 映像のカメラの印（本体、写している範囲の 4 本の線、地面からの柱）。
+    private let videoCamera = Entity()
+    private let cameraBody = ModelEntity()
+    private var cameraRays = [ModelEntity]()
+    private let cameraPole = ModelEntity()
+    private let cameraFoot = ModelEntity()
     private var joints = [Int: [PoseJoint: ModelEntity]]()
     private var bones = [Int: [ModelEntity]]()
     private var balls = [ModelEntity]()
@@ -27,12 +32,7 @@ final class SceneStore {
 
     init() {
         root.addChild(makeCourt())
-        videoCamera.model = ModelComponent(
-            mesh: .generateCone(height: 0.6, radius: 0.3),
-            materials: [UnlitMaterial(color: .black)]
-        )
-        videoCamera.isEnabled = false
-        root.addChild(videoCamera)
+        makeVideoCamera()
     }
 
     /// 今の視点の位置。
@@ -90,17 +90,65 @@ final class SceneStore {
 
     // MARK: - 映像のカメラ
 
+    /// 映像のカメラの印を作る。本体は黒い箱（レンズの側に青い円）、写している範囲は映像の四隅を通る 4 本の線、
+    /// 高さは地面からの柱で見せる。
+    private func makeVideoCamera() {
+        cameraBody.model = ModelComponent(
+            mesh: .generateBox(width: 0.32, height: 0.2, depth: 0.14, cornerRadius: 0.02),
+            materials: [UnlitMaterial(color: UIColorCompat.white(0.1))]
+        )
+        let lens = ModelEntity(
+            mesh: .generateCylinder(height: 0.06, radius: 0.07),
+            materials: [UnlitMaterial(color: UIColorCompat.rgb(SIMD3(0.15, 0.45, 0.95), alpha: 1))]
+        )
+        // 円柱は y の向きに伸びている。本体の前（-z）に、レンズとして寝かせて付ける。
+        lens.orientation = simd_quatf(angle: .pi / 2, axis: SIMD3(1, 0, 0))
+        lens.position = SIMD3(0, 0, -0.09)
+        cameraBody.addChild(lens)
+        videoCamera.addChild(cameraBody)
+        var rayMaterial = UnlitMaterial(color: UIColorCompat.rgb(SIMD3(0.15, 0.45, 0.95), alpha: 1))
+        rayMaterial.blending = .transparent(opacity: 0.6)
+        let rayMesh = MeshResource.generateCylinder(height: 1, radius: 0.012)
+        cameraRays = (0..<4).map { _ in
+            let ray = ModelEntity(mesh: rayMesh, materials: [rayMaterial])
+            videoCamera.addChild(ray)
+            return ray
+        }
+        cameraPole.model = ModelComponent(
+            mesh: .generateCylinder(height: 1, radius: 0.015), materials: [UnlitMaterial(color: UIColorCompat.white(0.35))]
+        )
+        videoCamera.addChild(cameraPole)
+        cameraFoot.model = ModelComponent(
+            mesh: .generateCylinder(height: 0.01, radius: 0.25), materials: [UnlitMaterial(color: UIColorCompat.white(0.35))]
+        )
+        videoCamera.addChild(cameraFoot)
+        videoCamera.isEnabled = false
+        root.addChild(videoCamera)
+    }
+
     private func updateVideoCamera(_ courtCamera: CourtCamera?) {
         guard let courtCamera else {
             videoCamera.isEnabled = false
             return
         }
-        // 視点が映像のカメラのそばにあるときは、目の前に大きく写ってしまうので、出さない。
-        videoCamera.isEnabled = simd_distance(eye, courtCamera.position) > 3
-        let position = SIMD3<Float>(courtCamera.position)
-        // 円錐は y の向きに尖っている。尖った先を、カメラの見ている向きにする。
-        videoCamera.position = position
-        videoCamera.orientation = simd_quatf(from: SIMD3(0, 1, 0), to: SIMD3<Float>(courtCamera.forward))
+        let position = courtCamera.position
+        // 視点が映像のカメラの位置そのもの（「カメラの視点」）のときは、目の前を覆ってしまうので出さない。
+        videoCamera.isEnabled = simd_distance(eye, position) > 0.5
+        // 本体の向き: 箱の x を映像の右、y を映像の上、-z を見ている向きにそろえる。
+        let right = simd_normalize(simd_cross(courtCamera.forward, courtCamera.up))
+        let axes = simd_float3x3(columns: (SIMD3<Float>(right), SIMD3<Float>(courtCamera.up), SIMD3<Float>(-courtCamera.forward)))
+        cameraBody.position = SIMD3<Float>(position)
+        cameraBody.orientation = simd_quatf(axes)
+        // 写している範囲: 映像の四隅を通る線を、地面に当たる所まで（遠ければ 8 m で止めて）引く。
+        let corners = [CGPoint(x: 0, y: 0), CGPoint(x: 1, y: 0), CGPoint(x: 1, y: 1), CGPoint(x: 0, y: 1)]
+        for (ray, corner) in zip(cameraRays, corners) {
+            let direction = courtCamera.direction(through: corner)
+            let toGround = courtCamera.groundPoint(for: corner).map { simd_distance($0, position) } ?? .infinity
+            place(ray, from: position, to: position + direction * min(toGround, 8))
+        }
+        let foot = SIMD3(position.x, 0, position.z)
+        place(cameraPole, from: foot, to: position)
+        cameraFoot.position = SIMD3<Float>(foot)
     }
 
     // MARK: - 選手

@@ -1,0 +1,221 @@
+lockfile_version: '1'
+dependencies: []
+deployments:
+- kind: project-relative
+  target: claude
+  value: .claude/skills/clip-play-videos
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: null
+- kind: project-relative
+  target: claude
+  value: .claude/skills/clip-play-videos/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: sha256:98c3b4175fda02abc34404e96fed65470e8bf42600cb8fa854f5c518d7c392f0
+- kind: project-relative
+  target: claude
+  value: .claude/skills/clip-play-videos/scripts/clip_sheet.py
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: sha256:32e846ea1a47ab585335e61637e7dc8a89b3c1955da6ccaa9934836d8be56fc5
+- kind: project-relative
+  target: claude
+  value: .claude/skills/improve-vision-accuracy
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: null
+- kind: project-relative
+  target: claude
+  value: .claude/skills/improve-vision-accuracy/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: sha256:c3637188e48849a63dc6e0e40efc24b8c263cfd84d5648490bfe75cb76b79567
+- kind: project-relative
+  target: claude
+  value: .claude/skills/improve-vision-accuracy/references/court.md
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: sha256:16d9118cd3850bd151252d07ba944daab7de7e514ba488f366090cb67890d79c
+- kind: project-relative
+  target: claude
+  value: .claude/skills/improve-vision-accuracy/references/pose.md
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: sha256:ebd7a060977989ebcebfeffb484c9f318d5983205dae9d2177c5b206ca2fb636
+- kind: project-relative
+  target: claude
+  value: .claude/skills/improve-vision-accuracy/scripts/compare_exports.py
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: sha256:a6c4a7e6a00033214bd4e84229681e0476780d0fef21c232efe8a07a7415fee8
+- kind: project-relative
+  target: claude
+  value: .claude/skills/improve-vision-accuracy/scripts/contact_sheet.swift
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: sha256:3ec811b2c48e15f7dfafb87890732d945ee9bd89200420fd1ab4a60f4b561260
+- kind: project-relative
+  target: claude
+  value: .claude/skills/improve-vision-accuracy/scripts/rank_videos.py
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: sha256:44d04486ad7609b02995878b27660bc6ced946cb1c93350f7b05c38b8b85fe5c
+- kind: project-relative
+  target: codex
+  value: .agents/skills/clip-play-videos
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: null
+- kind: project-relative
+  target: codex
+  value: .agents/skills/clip-play-videos/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: sha256:98c3b4175fda02abc34404e96fed65470e8bf42600cb8fa854f5c518d7c392f0
+- kind: project-relative
+  target: codex
+  value: .agents/skills/clip-play-videos/scripts/clip_sheet.py
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: sha256:32e846ea1a47ab585335e61637e7dc8a89b3c1955da6ccaa9934836d8be56fc5
+- kind: project-relative
+  target: codex
+  value: .agents/skills/improve-vision-accuracy
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: null
+- kind: project-relative
+  target: codex
+  value: .agents/skills/improve-vision-accuracy/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: sha256:c3637188e48849a63dc6e0e40efc24b8c263cfd84d5648490bfe75cb76b79567
+- kind: project-relative
+  target: codex
+  value: .agents/skills/improve-vision-accuracy/references/court.md
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: sha256:16d9118cd3850bd151252d07ba944daab7de7e514ba488f366090cb67890d79c
+- kind: project-relative
+  target: codex
+  value: .agents/skills/improve-vision-accuracy/references/pose.md
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: sha256:ebd7a060977989ebcebfeffb484c9f318d5983205dae9d2177c5b206ca2fb636
+- kind: project-relative
+  target: codex
+  value: .agents/skills/improve-vision-accuracy/scripts/compare_exports.py
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: sha256:a6c4a7e6a00033214bd4e84229681e0476780d0fef21c232efe8a07a7415fee8
+- kind: project-relative
+  target: codex
+  value: .agents/skills/improve-vision-accuracy/scripts/contact_sheet.swift
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: sha256:3ec811b2c48e15f7dfafb87890732d945ee9bd89200420fd1ab4a60f4b561260
+- kind: project-relative
+  target: codex
+  value: .agents/skills/improve-vision-accuracy/scripts/rank_videos.py
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: sha256:44d04486ad7609b02995878b27660bc6ced946cb1c93350f7b05c38b8b85fe5c
+local_deployed_files:
+- .agents/skills/clip-play-videos
+- .agents/skills/clip-play-videos/SKILL.md
+- .agents/skills/clip-play-videos/scripts/clip_sheet.py
+- .agents/skills/improve-vision-accuracy
+- .agents/skills/improve-vision-accuracy/SKILL.md
+- .agents/skills/improve-vision-accuracy/references/court.md
+- .agents/skills/improve-vision-accuracy/references/pose.md
+- .agents/skills/improve-vision-accuracy/scripts/compare_exports.py
+- .agents/skills/improve-vision-accuracy/scripts/contact_sheet.swift
+- .agents/skills/improve-vision-accuracy/scripts/rank_videos.py
+- .claude/skills/clip-play-videos
+- .claude/skills/clip-play-videos/SKILL.md
+- .claude/skills/clip-play-videos/scripts/clip_sheet.py
+- .claude/skills/improve-vision-accuracy
+- .claude/skills/improve-vision-accuracy/SKILL.md
+- .claude/skills/improve-vision-accuracy/references/court.md
+- .claude/skills/improve-vision-accuracy/references/pose.md
+- .claude/skills/improve-vision-accuracy/scripts/compare_exports.py
+- .claude/skills/improve-vision-accuracy/scripts/contact_sheet.swift
+- .claude/skills/improve-vision-accuracy/scripts/rank_videos.py
+local_deployed_file_hashes:
+  .agents/skills/clip-play-videos/SKILL.md: sha256:98c3b4175fda02abc34404e96fed65470e8bf42600cb8fa854f5c518d7c392f0
+  .agents/skills/clip-play-videos/scripts/clip_sheet.py: sha256:32e846ea1a47ab585335e61637e7dc8a89b3c1955da6ccaa9934836d8be56fc5
+  .agents/skills/improve-vision-accuracy/SKILL.md: sha256:c3637188e48849a63dc6e0e40efc24b8c263cfd84d5648490bfe75cb76b79567
+  .agents/skills/improve-vision-accuracy/references/court.md: sha256:16d9118cd3850bd151252d07ba944daab7de7e514ba488f366090cb67890d79c
+  .agents/skills/improve-vision-accuracy/references/pose.md: sha256:ebd7a060977989ebcebfeffb484c9f318d5983205dae9d2177c5b206ca2fb636
+  .agents/skills/improve-vision-accuracy/scripts/compare_exports.py: sha256:a6c4a7e6a00033214bd4e84229681e0476780d0fef21c232efe8a07a7415fee8
+  .agents/skills/improve-vision-accuracy/scripts/contact_sheet.swift: sha256:3ec811b2c48e15f7dfafb87890732d945ee9bd89200420fd1ab4a60f4b561260
+  .agents/skills/improve-vision-accuracy/scripts/rank_videos.py: sha256:44d04486ad7609b02995878b27660bc6ced946cb1c93350f7b05c38b8b85fe5c
+  .claude/skills/clip-play-videos/SKILL.md: sha256:98c3b4175fda02abc34404e96fed65470e8bf42600cb8fa854f5c518d7c392f0
+  .claude/skills/clip-play-videos/scripts/clip_sheet.py: sha256:32e846ea1a47ab585335e61637e7dc8a89b3c1955da6ccaa9934836d8be56fc5
+  .claude/skills/improve-vision-accuracy/SKILL.md: sha256:c3637188e48849a63dc6e0e40efc24b8c263cfd84d5648490bfe75cb76b79567
+  .claude/skills/improve-vision-accuracy/references/court.md: sha256:16d9118cd3850bd151252d07ba944daab7de7e514ba488f366090cb67890d79c
+  .claude/skills/improve-vision-accuracy/references/pose.md: sha256:ebd7a060977989ebcebfeffb484c9f318d5983205dae9d2177c5b206ca2fb636
+  .claude/skills/improve-vision-accuracy/scripts/compare_exports.py: sha256:a6c4a7e6a00033214bd4e84229681e0476780d0fef21c232efe8a07a7415fee8
+  .claude/skills/improve-vision-accuracy/scripts/contact_sheet.swift: sha256:3ec811b2c48e15f7dfafb87890732d945ee9bd89200420fd1ab4a60f4b561260
+  .claude/skills/improve-vision-accuracy/scripts/rank_videos.py: sha256:44d04486ad7609b02995878b27660bc6ced946cb1c93350f7b05c38b8b85fe5c

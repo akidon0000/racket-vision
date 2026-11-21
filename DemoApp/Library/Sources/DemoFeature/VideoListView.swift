@@ -1,8 +1,9 @@
 import CameraDetection
 import SwiftUI
+import VideoCatalog
 import VideoPlayback
 
-/// 一覧の画面。一番上にカメラで撮影する入口を置き、その下にアプリに入っている動画を並べる。
+/// 一覧の画面。一番上にカメラで撮影する入口を置き、その下にアプリに入っている動画を、見出し（精度が良い動画、撮った日、サンプル動画）ごとに並べる。
 /// 選んだ動画は、コートの検出の枠つきで流す。
 ///
 /// 起動引数 `-autoplay <動画の名前の一部>` を渡すと、その動画を開いた状態で始まる（実機で、画面に触れずに確かめるため）。
@@ -13,6 +14,9 @@ public struct VideoListView: View {
 
     private let videos: [URL] = (Bundle.main.urls(forResourcesWithExtension: "mp4", subdirectory: nil) ?? [])
         .sorted { $0.lastPathComponent < $1.lastPathComponent }
+    /// 一番上に出す、精度の計測で結果が良かった動画（DemoApp/App/App/featured-videos.json）。
+    private let featured = FeaturedVideos(contentsOf: Bundle.main.url(forResource: "featured-videos", withExtension: "json"))
+    private var shelves: [VideoShelf] { VideoShelf.shelves(for: videos, featured: featured) }
 
     public var body: some View {
         NavigationStack(path: $path) {
@@ -31,13 +35,24 @@ public struct VideoListView: View {
                     Label("カメラで撮影", systemImage: "camera")
                 }
             }
-            Section("動画") {
-                if videos.isEmpty {
-                    Text("動画が入っていません。DemoApp/videos に動画を置き、アプリを作り直してください。")
+            if videos.isEmpty {
+                Section("動画") {
+                    Text("動画が入っていません。DemoApp/SamplePlayVideos/FullLength に動画を置き、アプリを作り直してください。")
                         .foregroundStyle(.secondary)
                 }
-                ForEach(videos, id: \.self) { url in
-                    NavigationLink(url.deletingPathExtension().lastPathComponent, value: url)
+            }
+            ForEach(shelves) { shelf in
+                Section(shelf.title) {
+                    ForEach(shelf.videos, id: \.self) { url in
+                        NavigationLink(value: url) {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(url.deletingPathExtension().lastPathComponent)
+                                if let caption = shelf.captions[url] {
+                                    Text(caption).font(.caption).foregroundStyle(.secondary)
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }

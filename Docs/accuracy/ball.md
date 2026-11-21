@@ -33,7 +33,7 @@
 測り直す手順:
 
 ```bash
-COURT_DEMO_DIR=$PWD/DemoApp/videos BALL_COURT=1 BALL_COURT_CACHE=<矩形を残すフォルダ> BALL_REPORT_DIR=<書き出す先> \
+COURT_DEMO_DIR=$PWD/DemoApp/SamplePlayVideos/FullLength BALL_COURT=1 BALL_COURT_CACHE=<矩形を残すフォルダ> BALL_REPORT_DIR=<書き出す先> \
   xcrun swift test -c release -Xswiftc -enable-testing --filter reportsBallsOnDemoVideos
 ```
 
@@ -160,7 +160,7 @@ COURT_DEMO_DIR=$PWD/DemoApp/videos BALL_COURT=1 BALL_COURT_CACHE=<矩形を残�
 
 ## 確かめていないこと・分かっている限界
 
-- 見逃し（球があるのに出さない）は、正解のラベルで測っていない。`ball-labeling/` の 40 フレームは未記入。上の割合は、ラリーの合間（球を持って歩く、画面に球が無い）も分母に入っている。
+- 見逃し（球があるのに出さない）は、正解のラベルで測っていない。`Tests/BallAnnotations/` の 40 フレームは未記入。上の割合は、ラリーの合間（球を持って歩く、画面に球が無い）も分母に入っている。
 - 目視は 1 人の判定で、動いている検出だけを見た。止まっている検出（手に持った球など）は見ていない。
 - 黄緑でない球は拾えない。1min-09（オレンジ）は、灯りや横断幕を球として出す。1min-10（白っぽい）は何も出さない。使う側が `BallColor` を変える必要がある。
 - コートが見つからない場面（観客の大写しなど）では、範囲で絞れないので、帽子の柄や服を拾うことがある（1min-03）。

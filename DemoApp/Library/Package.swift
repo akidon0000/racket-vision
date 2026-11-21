@@ -63,16 +63,26 @@ let package = Package(
             ],
             swiftSettings: [.swiftLanguageMode(.v5)]
         ),
-        // カメラの映像に、コートの検出の枠を重ねる
+        // カメラの映像に、コートの検出の枠を重ねる。球と選手の骨格も検出し、右下に小さく 3D で描く
         .target(
             name: "CameraDetection",
-            dependencies: ["CourtLineOverlay", .product(name: "CourtFit", package: "racket-vision")],
+            dependencies: [
+                "CourtLineOverlay",
+                "PlayerPoseOverlay",
+                "CourtSceneView",
+                .product(name: "CourtFit", package: "racket-vision"),
+                .product(name: "BallTracking", package: "racket-vision"),
+                .product(name: "PlayerPose", package: "racket-vision")
+            ],
             swiftSettings: [.swiftLanguageMode(.v5)]
         ),
+        // 動画の一覧を、見出し（撮った日、サンプル動画）ごとに分ける
+        .target(name: "VideoCatalog"),
+        .testTarget(name: "VideoCatalogTests", dependencies: ["VideoCatalog"]),
         // 一覧の画面（動画の一覧と、カメラの入口）
         .target(
             name: "DemoFeature",
-            dependencies: ["VideoPlayback", "CameraDetection"],
+            dependencies: ["VideoPlayback", "CameraDetection", "VideoCatalog"],
             swiftSettings: [.swiftLanguageMode(.v5)]
         )
     ]
