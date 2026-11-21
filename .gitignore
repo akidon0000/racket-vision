@@ -4,3 +4,26 @@
 xcuserdata/
 DerivedData/
 *.xcresult
+
+# APM (sources live in .apm/; `apm install` regenerates these)
+apm_modules/
+.agents/skills/
+
+# APM deploys per-tool settings, MCP configs and instruction files at the root.
+# The exact set depends on `targets` and dependencies; revisit this list when they change.
+# CLAUDE.md は手で書く作業メモなので git に入れる（.apm/instructions からは作らない。ADR 0001）。
+/.claude/
+/.codex/
+/.cursor/
+/.gemini/
+/.mcp.json
+/.github/mcp.json
+/.vscode/mcp.json
+/.kiro/
+/AGENTS.md
+
+# Serena MCP — ローカルのプロジェクト設定・キャッシュ
+/.serena/
+
+# 球の正解づけの画像（Tests/BallAnnotations/frames.json の動画と秒から抜いたもの。大きいので git に入れない）
+/Tests/BallAnnotations/frames/

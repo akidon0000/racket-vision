@@ -82,6 +82,7 @@ public struct CourtLineModelSearch: Sendable {
             .max {
                 $0.support * sizeFactor($0.homography.matrix, size: mask.size) < $1.support * sizeFactor($1.homography.matrix, size: mask.size)
             }
+            .map { resolvingNearHalf($0, ridge: ridge, mask: mask) }
     }
 
     /// 大きく写っているコートほど大きい重み（0.6〜1）。隣や奥のコートより、カメラが向いているコートを選ぶため。
@@ -101,7 +102,35 @@ public struct CourtLineModelSearch: Sendable {
     public func track(_ ridge: EdgeMap, from previous: Homography) -> CourtFit? {
         let mask = RidgeMask(ridge, threshold: ridgeThreshold)
         guard let fit = refine(previous, ridge: ridge, mask: mask), isAccepted(fit, mask: mask) else { return nil }
-        return fit
+        return resolvingNearHalf(fit, ridge: ridge, mask: mask)
+    }
+
+    /// 低い位置から撮った映像では、手前の半面（ベースラインからネット、またはキッチンの線まで）を、コート全体と取り違えることがある。
+    /// 手前の半面にも、ベースライン・サイドライン・センターライン・それを閉じる横の線があり、図面の 8 本のうち 5 本が重なるため。
+    /// 取り違えていると、図面の手前のキッチンの線（手前に長く写るはず）の上に芯が無い。そのときだけ、今の四角形の奥の辺が
+    /// ネット、または手前のキッチンの線だとした変換も合わせ直す。合わせ直した後に手前のキッチンの線が見え、画面の上の長さで
+    /// 重みを付けた支持が 0.03 より多く高ければ、そちらを選ぶ（2026-11-19 の 5020-2 では 0.75 から 0.81 に上がった）。
+    func resolvingNearHalf(_ fit: CourtFit, ridge: EdgeMap, mask: RidgeMask) -> CourtFit {
+        let nearKitchen = CourtLine(start: .nearKitchenLeft, end: .nearKitchenRight)
+        guard !mask.isLineSupported(nearKitchen, matrix: fit.homography.matrix, model: model),
+              let current = mask.lengthWeightedSupport(of: fit.homography.matrix, model: model) else { return fit }
+        var best = (fit: fit, score: current)
+        let half = model.length / 2
+        for farEdge in [0.0, -model.kitchenDepth] {
+            // 本当の図面の y（-half〜farEdge）を、今の変換の図面の y（-half〜half）へ伸ばす。
+            let scale = model.length / (farEdge + half)
+            let stretch = simd_double3x3(rows: [SIMD3(1, 0, 0), SIMD3(0, scale, -half + scale * half), SIMD3(0, 0, 1)])
+            let start = Homography(matrix: fit.homography.matrix * stretch)
+            // 伸ばした出発点は、取り違えたまま合わせた分だけずれているので、合わせ直しを 2 回かける。
+            guard isPlausible(start.matrix, size: mask.size),
+                  let first = refine(start, ridge: ridge, mask: mask),
+                  let candidate = refine(first.homography, ridge: ridge, mask: mask),
+                  mask.isLineSupported(nearKitchen, matrix: candidate.homography.matrix, model: model),
+                  let score = mask.lengthWeightedSupport(of: candidate.homography.matrix, model: model),
+                  score > best.score + 0.03 else { continue }
+            best = (candidate, score)
+        }
+        return best.fit
     }
 
     /// 返してよい結果か。支持率が下限以上で、図面の線のうち `minimumSupportedLines` 本以上が見えていること。

@@ -2,7 +2,7 @@
 import Foundation
 import simd
 
-/// デモ動画 1 本ぶんの正解。人が、フレームの上で交点の位置を指定して作る（`tools/court-annotator/index.html`）。
+/// デモ動画 1 本ぶんの正解。人が、フレームの上で交点の位置を指定して作る（`Tools/court-annotator/index.html`）。
 /// ファイルは `Tests/CourtAnnotations/<動画の名前（拡張子なし）>.json` に置く。
 struct CourtAnnotation: Codable {
     /// 1 フレームぶんの正解。

@@ -1,0 +1,10 @@
+# xcodegen で作る（App/project.yml、DeviceLab/App/project.yml から生成する）
+/App/*.xcodeproj/
+/DeviceLab/App/*.xcodeproj/
+
+# サンプル動画（手で置く。アプリのビルド時に入る）
+/SamplePlayVideos/FullLength/
+# ラリーごとに切り出した動画（アプリには入れない。Clips/README.md）
+/SamplePlayVideos/RallyClips/
+
+.build/

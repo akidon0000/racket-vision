@@ -1,0 +1,517 @@
+lockfile_version: '1'
+dependencies: []
+deployments:
+- kind: project-relative
+  target: claude
+  value: .claude/skills/auto-create-documentation
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: null
+- kind: project-relative
+  target: claude
+  value: .claude/skills/auto-create-documentation/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: sha256:ab9e2f8d3b62765a1a6cc73f461358b999fd199396d77cd5a1405be1b43b1fd5
+- kind: project-relative
+  target: claude
+  value: .claude/skills/auto-create-pr
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: null
+- kind: project-relative
+  target: claude
+  value: .claude/skills/auto-create-pr/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: sha256:39cf9a8cc950b81382d51f562c05d584e47681c1343afa1b9f41ba245dda9e0f
+- kind: project-relative
+  target: claude
+  value: .claude/skills/auto-create-pr/templates/default.md
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: sha256:9d261144136ec432faad2da5bce7dce8f0160a7ad5709f2a9ad545ecb4711ba2
+- kind: project-relative
+  target: claude
+  value: .claude/skills/clip-play-videos
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: null
+- kind: project-relative
+  target: claude
+  value: .claude/skills/clip-play-videos/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: sha256:98c3b4175fda02abc34404e96fed65470e8bf42600cb8fa854f5c518d7c392f0
+- kind: project-relative
+  target: claude
+  value: .claude/skills/clip-play-videos/scripts/clip_sheet.py
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: sha256:32e846ea1a47ab585335e61637e7dc8a89b3c1955da6ccaa9934836d8be56fc5
+- kind: project-relative
+  target: claude
+  value: .claude/skills/improve-vision-accuracy
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: null
+- kind: project-relative
+  target: claude
+  value: .claude/skills/improve-vision-accuracy/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: sha256:c3637188e48849a63dc6e0e40efc24b8c263cfd84d5648490bfe75cb76b79567
+- kind: project-relative
+  target: claude
+  value: .claude/skills/improve-vision-accuracy/references/court.md
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: sha256:16d9118cd3850bd151252d07ba944daab7de7e514ba488f366090cb67890d79c
+- kind: project-relative
+  target: claude
+  value: .claude/skills/improve-vision-accuracy/references/pose.md
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: sha256:ebd7a060977989ebcebfeffb484c9f318d5983205dae9d2177c5b206ca2fb636
+- kind: project-relative
+  target: claude
+  value: .claude/skills/improve-vision-accuracy/scripts/compare_exports.py
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: sha256:a6c4a7e6a00033214bd4e84229681e0476780d0fef21c232efe8a07a7415fee8
+- kind: project-relative
+  target: claude
+  value: .claude/skills/improve-vision-accuracy/scripts/contact_sheet.swift
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: sha256:3ec811b2c48e15f7dfafb87890732d945ee9bd89200420fd1ab4a60f4b561260
+- kind: project-relative
+  target: claude
+  value: .claude/skills/improve-vision-accuracy/scripts/rank_videos.py
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: sha256:44d04486ad7609b02995878b27660bc6ced946cb1c93350f7b05c38b8b85fe5c
+- kind: project-relative
+  target: claude
+  value: .claude/skills/wiki-git
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: null
+- kind: project-relative
+  target: claude
+  value: .claude/skills/wiki-git/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: sha256:59eeda0a5bac4f31fe275b0027cff1eec438a66d88d9c6af6019e9ae783b7afb
+- kind: project-relative
+  target: claude
+  value: .claude/skills/wiki-repo
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: null
+- kind: project-relative
+  target: claude
+  value: .claude/skills/wiki-repo/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: sha256:192a232a64d366374783de9ec3114194c6eb97873e4f9e186e76d2144e4eb740
+- kind: project-relative
+  target: claude
+  value: .claude/skills/wiki-repo/guideline.md
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: sha256:e269da0510c1812f91d91d435287e9e20ca85ae8252433ecc03ef2dc3a6c744b
+- kind: project-relative
+  target: claude
+  value: .claude/skills/write-adr
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: null
+- kind: project-relative
+  target: claude
+  value: .claude/skills/write-adr/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: sha256:b9bfa46d6421e302634e08c004d699a9a9c03f76788c1bce29d64b65c928341a
+- kind: project-relative
+  target: claude
+  value: .claude/skills/write-wiki
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: null
+- kind: project-relative
+  target: claude
+  value: .claude/skills/write-wiki/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: sha256:dc0d88f2aaaaea89444395a3101783f722c84154fd5982d0aae3f58b3a43c256
+- kind: project-relative
+  target: codex
+  value: .agents/skills/auto-create-documentation
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: null
+- kind: project-relative
+  target: codex
+  value: .agents/skills/auto-create-documentation/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: sha256:ab9e2f8d3b62765a1a6cc73f461358b999fd199396d77cd5a1405be1b43b1fd5
+- kind: project-relative
+  target: codex
+  value: .agents/skills/auto-create-pr
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: null
+- kind: project-relative
+  target: codex
+  value: .agents/skills/auto-create-pr/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: sha256:39cf9a8cc950b81382d51f562c05d584e47681c1343afa1b9f41ba245dda9e0f
+- kind: project-relative
+  target: codex
+  value: .agents/skills/auto-create-pr/templates/default.md
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: sha256:9d261144136ec432faad2da5bce7dce8f0160a7ad5709f2a9ad545ecb4711ba2
+- kind: project-relative
+  target: codex
+  value: .agents/skills/clip-play-videos
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: null
+- kind: project-relative
+  target: codex
+  value: .agents/skills/clip-play-videos/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: sha256:98c3b4175fda02abc34404e96fed65470e8bf42600cb8fa854f5c518d7c392f0
+- kind: project-relative
+  target: codex
+  value: .agents/skills/clip-play-videos/scripts/clip_sheet.py
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: sha256:32e846ea1a47ab585335e61637e7dc8a89b3c1955da6ccaa9934836d8be56fc5
+- kind: project-relative
+  target: codex
+  value: .agents/skills/improve-vision-accuracy
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: null
+- kind: project-relative
+  target: codex
+  value: .agents/skills/improve-vision-accuracy/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: sha256:c3637188e48849a63dc6e0e40efc24b8c263cfd84d5648490bfe75cb76b79567
+- kind: project-relative
+  target: codex
+  value: .agents/skills/improve-vision-accuracy/references/court.md
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: sha256:16d9118cd3850bd151252d07ba944daab7de7e514ba488f366090cb67890d79c
+- kind: project-relative
+  target: codex
+  value: .agents/skills/improve-vision-accuracy/references/pose.md
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: sha256:ebd7a060977989ebcebfeffb484c9f318d5983205dae9d2177c5b206ca2fb636
+- kind: project-relative
+  target: codex
+  value: .agents/skills/improve-vision-accuracy/scripts/compare_exports.py
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: sha256:a6c4a7e6a00033214bd4e84229681e0476780d0fef21c232efe8a07a7415fee8
+- kind: project-relative
+  target: codex
+  value: .agents/skills/improve-vision-accuracy/scripts/contact_sheet.swift
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: sha256:3ec811b2c48e15f7dfafb87890732d945ee9bd89200420fd1ab4a60f4b561260
+- kind: project-relative
+  target: codex
+  value: .agents/skills/improve-vision-accuracy/scripts/rank_videos.py
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: sha256:44d04486ad7609b02995878b27660bc6ced946cb1c93350f7b05c38b8b85fe5c
+- kind: project-relative
+  target: codex
+  value: .agents/skills/wiki-git
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: null
+- kind: project-relative
+  target: codex
+  value: .agents/skills/wiki-git/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: sha256:59eeda0a5bac4f31fe275b0027cff1eec438a66d88d9c6af6019e9ae783b7afb
+- kind: project-relative
+  target: codex
+  value: .agents/skills/wiki-repo
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: null
+- kind: project-relative
+  target: codex
+  value: .agents/skills/wiki-repo/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: sha256:192a232a64d366374783de9ec3114194c6eb97873e4f9e186e76d2144e4eb740
+- kind: project-relative
+  target: codex
+  value: .agents/skills/wiki-repo/guideline.md
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: sha256:e269da0510c1812f91d91d435287e9e20ca85ae8252433ecc03ef2dc3a6c744b
+- kind: project-relative
+  target: codex
+  value: .agents/skills/write-adr
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: null
+- kind: project-relative
+  target: codex
+  value: .agents/skills/write-adr/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: sha256:b9bfa46d6421e302634e08c004d699a9a9c03f76788c1bce29d64b65c928341a
+- kind: project-relative
+  target: codex
+  value: .agents/skills/write-wiki
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: null
+- kind: project-relative
+  target: codex
+  value: .agents/skills/write-wiki/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: sha256:dc0d88f2aaaaea89444395a3101783f722c84154fd5982d0aae3f58b3a43c256
+local_deployed_files:
+- .agents/skills/auto-create-documentation
+- .agents/skills/auto-create-documentation/SKILL.md
+- .agents/skills/auto-create-pr
+- .agents/skills/auto-create-pr/SKILL.md
+- .agents/skills/auto-create-pr/templates/default.md
+- .agents/skills/clip-play-videos
+- .agents/skills/clip-play-videos/SKILL.md
+- .agents/skills/clip-play-videos/scripts/clip_sheet.py
+- .agents/skills/improve-vision-accuracy
+- .agents/skills/improve-vision-accuracy/SKILL.md
+- .agents/skills/improve-vision-accuracy/references/court.md
+- .agents/skills/improve-vision-accuracy/references/pose.md
+- .agents/skills/improve-vision-accuracy/scripts/compare_exports.py
+- .agents/skills/improve-vision-accuracy/scripts/contact_sheet.swift
+- .agents/skills/improve-vision-accuracy/scripts/rank_videos.py
+- .agents/skills/wiki-git
+- .agents/skills/wiki-git/SKILL.md
+- .agents/skills/wiki-repo
+- .agents/skills/wiki-repo/SKILL.md
+- .agents/skills/wiki-repo/guideline.md
+- .agents/skills/write-adr
+- .agents/skills/write-adr/SKILL.md
+- .agents/skills/write-wiki
+- .agents/skills/write-wiki/SKILL.md
+- .claude/skills/auto-create-documentation
+- .claude/skills/auto-create-documentation/SKILL.md
+- .claude/skills/auto-create-pr
+- .claude/skills/auto-create-pr/SKILL.md
+- .claude/skills/auto-create-pr/templates/default.md
+- .claude/skills/clip-play-videos
+- .claude/skills/clip-play-videos/SKILL.md
+- .claude/skills/clip-play-videos/scripts/clip_sheet.py
+- .claude/skills/improve-vision-accuracy
+- .claude/skills/improve-vision-accuracy/SKILL.md
+- .claude/skills/improve-vision-accuracy/references/court.md
+- .claude/skills/improve-vision-accuracy/references/pose.md
+- .claude/skills/improve-vision-accuracy/scripts/compare_exports.py
+- .claude/skills/improve-vision-accuracy/scripts/contact_sheet.swift
+- .claude/skills/improve-vision-accuracy/scripts/rank_videos.py
+- .claude/skills/wiki-git
+- .claude/skills/wiki-git/SKILL.md
+- .claude/skills/wiki-repo
+- .claude/skills/wiki-repo/SKILL.md
+- .claude/skills/wiki-repo/guideline.md
+- .claude/skills/write-adr
+- .claude/skills/write-adr/SKILL.md
+- .claude/skills/write-wiki
+- .claude/skills/write-wiki/SKILL.md
+local_deployed_file_hashes:
+  .agents/skills/auto-create-documentation/SKILL.md: sha256:ab9e2f8d3b62765a1a6cc73f461358b999fd199396d77cd5a1405be1b43b1fd5
+  .agents/skills/auto-create-pr/SKILL.md: sha256:39cf9a8cc950b81382d51f562c05d584e47681c1343afa1b9f41ba245dda9e0f
+  .agents/skills/auto-create-pr/templates/default.md: sha256:9d261144136ec432faad2da5bce7dce8f0160a7ad5709f2a9ad545ecb4711ba2
+  .agents/skills/clip-play-videos/SKILL.md: sha256:98c3b4175fda02abc34404e96fed65470e8bf42600cb8fa854f5c518d7c392f0
+  .agents/skills/clip-play-videos/scripts/clip_sheet.py: sha256:32e846ea1a47ab585335e61637e7dc8a89b3c1955da6ccaa9934836d8be56fc5
+  .agents/skills/improve-vision-accuracy/SKILL.md: sha256:c3637188e48849a63dc6e0e40efc24b8c263cfd84d5648490bfe75cb76b79567
+  .agents/skills/improve-vision-accuracy/references/court.md: sha256:16d9118cd3850bd151252d07ba944daab7de7e514ba488f366090cb67890d79c
+  .agents/skills/improve-vision-accuracy/references/pose.md: sha256:ebd7a060977989ebcebfeffb484c9f318d5983205dae9d2177c5b206ca2fb636
+  .agents/skills/improve-vision-accuracy/scripts/compare_exports.py: sha256:a6c4a7e6a00033214bd4e84229681e0476780d0fef21c232efe8a07a7415fee8
+  .agents/skills/improve-vision-accuracy/scripts/contact_sheet.swift: sha256:3ec811b2c48e15f7dfafb87890732d945ee9bd89200420fd1ab4a60f4b561260
+  .agents/skills/improve-vision-accuracy/scripts/rank_videos.py: sha256:44d04486ad7609b02995878b27660bc6ced946cb1c93350f7b05c38b8b85fe5c
+  .agents/skills/wiki-git/SKILL.md: sha256:59eeda0a5bac4f31fe275b0027cff1eec438a66d88d9c6af6019e9ae783b7afb
+  .agents/skills/wiki-repo/SKILL.md: sha256:192a232a64d366374783de9ec3114194c6eb97873e4f9e186e76d2144e4eb740
+  .agents/skills/wiki-repo/guideline.md: sha256:e269da0510c1812f91d91d435287e9e20ca85ae8252433ecc03ef2dc3a6c744b
+  .agents/skills/write-adr/SKILL.md: sha256:b9bfa46d6421e302634e08c004d699a9a9c03f76788c1bce29d64b65c928341a
+  .agents/skills/write-wiki/SKILL.md: sha256:dc0d88f2aaaaea89444395a3101783f722c84154fd5982d0aae3f58b3a43c256
+  .claude/skills/auto-create-documentation/SKILL.md: sha256:ab9e2f8d3b62765a1a6cc73f461358b999fd199396d77cd5a1405be1b43b1fd5
+  .claude/skills/auto-create-pr/SKILL.md: sha256:39cf9a8cc950b81382d51f562c05d584e47681c1343afa1b9f41ba245dda9e0f
+  .claude/skills/auto-create-pr/templates/default.md: sha256:9d261144136ec432faad2da5bce7dce8f0160a7ad5709f2a9ad545ecb4711ba2
+  .claude/skills/clip-play-videos/SKILL.md: sha256:98c3b4175fda02abc34404e96fed65470e8bf42600cb8fa854f5c518d7c392f0
+  .claude/skills/clip-play-videos/scripts/clip_sheet.py: sha256:32e846ea1a47ab585335e61637e7dc8a89b3c1955da6ccaa9934836d8be56fc5
+  .claude/skills/improve-vision-accuracy/SKILL.md: sha256:c3637188e48849a63dc6e0e40efc24b8c263cfd84d5648490bfe75cb76b79567
+  .claude/skills/improve-vision-accuracy/references/court.md: sha256:16d9118cd3850bd151252d07ba944daab7de7e514ba488f366090cb67890d79c
+  .claude/skills/improve-vision-accuracy/references/pose.md: sha256:ebd7a060977989ebcebfeffb484c9f318d5983205dae9d2177c5b206ca2fb636
+  .claude/skills/improve-vision-accuracy/scripts/compare_exports.py: sha256:a6c4a7e6a00033214bd4e84229681e0476780d0fef21c232efe8a07a7415fee8
+  .claude/skills/improve-vision-accuracy/scripts/contact_sheet.swift: sha256:3ec811b2c48e15f7dfafb87890732d945ee9bd89200420fd1ab4a60f4b561260
+  .claude/skills/improve-vision-accuracy/scripts/rank_videos.py: sha256:44d04486ad7609b02995878b27660bc6ced946cb1c93350f7b05c38b8b85fe5c
+  .claude/skills/wiki-git/SKILL.md: sha256:59eeda0a5bac4f31fe275b0027cff1eec438a66d88d9c6af6019e9ae783b7afb
+  .claude/skills/wiki-repo/SKILL.md: sha256:192a232a64d366374783de9ec3114194c6eb97873e4f9e186e76d2144e4eb740
+  .claude/skills/wiki-repo/guideline.md: sha256:e269da0510c1812f91d91d435287e9e20ca85ae8252433ecc03ef2dc3a6c744b
+  .claude/skills/write-adr/SKILL.md: sha256:b9bfa46d6421e302634e08c004d699a9a9c03f76788c1bce29d64b65c928341a
+  .claude/skills/write-wiki/SKILL.md: sha256:dc0d88f2aaaaea89444395a3101783f722c84154fd5982d0aae3f58b3a43c256

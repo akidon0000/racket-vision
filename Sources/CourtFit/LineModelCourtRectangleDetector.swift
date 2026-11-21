@@ -10,10 +10,13 @@ public struct LineModelCourtRectangleDetector: CourtRectangleDetector {
     public var search: CourtLineModelSearch
     /// 見つけた後に、元の大きさの画像で合わせ直すか。
     public var polishes: Bool
+    /// 拾う線の色。
+    public var lineColor: CourtLineColor
 
-    public init(search: CourtLineModelSearch = CourtLineModelSearch(), polishes: Bool = false) {
+    public init(search: CourtLineModelSearch = CourtLineModelSearch(), polishes: Bool = false, lineColor: CourtLineColor = .white) {
         self.search = search
         self.polishes = polishes
+        self.lineColor = lineColor
     }
 
     public var method: CourtDetectionMethod { polishes ? .lineModelPolished : .lineModel }
@@ -21,9 +24,9 @@ public struct LineModelCourtRectangleDetector: CourtRectangleDetector {
     public func detect(in pixelBuffer: CVPixelBuffer, orientation: CGImagePropertyOrientation) -> DetectionOutcome {
         let started = CFAbsoluteTimeGetCurrent()
         // 画素のまま使えるのは `.up` のときだけ。
-        let ridge = orientation == .up ? EdgeMap(whiteRidgeOf: pixelBuffer) : nil
+        let ridge = orientation == .up ? EdgeMap(ridgeOf: pixelBuffer, lineColor: lineColor) : nil
         var fit = ridge.flatMap { search.search($0) }
-        if polishes, let found = fit, let full = EdgeMap(whiteRidgeOf: pixelBuffer, downscale: 1) {
+        if polishes, let found = fit, let full = EdgeMap(ridgeOf: pixelBuffer, lineColor: lineColor, downscale: 1) {
             fit = search.polish(found, fullRidge: full, scale: Double(full.width) / Double(ridge?.width ?? full.width))
         }
         let size = polishes && fit != nil
@@ -43,16 +46,31 @@ public final class TrackingLineModelCourtRectangleDetector: CourtRectangleDetect
     private let lock = NSLock()
     private var previous: Homography?
     private var framesSinceSearch: Int
+    private var currentLineColor: CourtLineColor
 
-    public init(search: CourtLineModelSearch = CourtLineModelSearch(), searchInterval: Int = 5) {
+    public init(search: CourtLineModelSearch = CourtLineModelSearch(), searchInterval: Int = 5, lineColor: CourtLineColor = .white) {
         self.search = search
         self.searchInterval = searchInterval
         framesSinceSearch = searchInterval
+        currentLineColor = lineColor
+    }
+
+    /// 拾う線の色。
+    public var lineColor: CourtLineColor { lock.withLock { currentLineColor } }
+
+    /// 拾う線の色を切り替える（動画の途中で、線の色が分かったとき）。色が変わったら、追従をやめて探し直す。
+    public func setLineColor(_ lineColor: CourtLineColor) {
+        lock.withLock {
+            guard lineColor != currentLineColor else { return }
+            currentLineColor = lineColor
+            previous = nil
+            framesSinceSearch = searchInterval
+        }
     }
 
     public func detect(in pixelBuffer: CVPixelBuffer, orientation: CGImagePropertyOrientation) -> DetectionOutcome {
         let started = CFAbsoluteTimeGetCurrent()
-        let ridge = orientation == .up ? EdgeMap(whiteRidgeOf: pixelBuffer) : nil
+        let ridge = orientation == .up ? EdgeMap(ridgeOf: pixelBuffer, lineColor: lineColor) : nil
         let fit = ridge.flatMap { next($0) }
         let size = ridge.map { CGSize(width: $0.width, height: $0.height) } ?? .zero
         return search.outcome(method, fit: fit, size: size, started: started, imageSize: uprightImageSize(of: pixelBuffer, orientation: orientation))
