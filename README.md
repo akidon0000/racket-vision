@@ -59,6 +59,14 @@ make setup
 | --- | --- |
 | [improve-vision-accuracy](.apm/skills/improve-vision-accuracy/SKILL.md) | 解析の精度を、動画で測り、目で確かめ、直して記録する |
 | [clip-play-videos](.apm/skills/clip-play-videos/SKILL.md) | 撮った動画から、プレーしている所（ラリー）だけを切り出し、アプリと Downloads に置く |
+| [write-adr](.apm/skills/write-adr/SKILL.md) | 設計判断を `Docs/adr/` に ADR として書く |
+| [write-wiki](.apm/skills/write-wiki/SKILL.md) | 手順を wiki-* スキルに書く |
+| [wiki-git](.apm/skills/wiki-git/SKILL.md) | ブランチ、コミット、PR の決まりと、コミットの前に流す検証 |
+| [wiki-repo](.apm/skills/wiki-repo/SKILL.md) | リポジトリの構成、フォルダの名前、記録の基準、スキルの足し方 |
+| [auto-create-documentation](.apm/skills/auto-create-documentation/SKILL.md) | 変更のあと、判断・手順・計測の結果をどこに残すかを決めて書く |
+| [auto-create-pr](.apm/skills/auto-create-pr/SKILL.md) | コミット、push、PR の作成をまとめて行う |
+
+設計判断の記録（ADR）は [Docs/adr/](Docs/adr/README.md) にある。
 
 ## 整形と Lint
 
@@ -81,3 +89,7 @@ swiftlint lint --strict
 | `DemoApp/SamplePlayVideos` | 動画（git に入れない）。`FullLength/` は元の長さの動画で、アプリに入り、精度の計測にも使う。`RallyClips/` はラリーごとの切り出しで、アプリには入れない |
 | `DemoApp/Clips` | 撮った動画の向きをそろえ、ラリーごとに切り出す道具（[clip-play-videos](.apm/skills/clip-play-videos/SKILL.md)） |
 | `DemoApp/DeviceLab`（macOS） | iPhone の機種と OS の条件で、デモと同じ処理を Mac で流し、2 機種を並べて比べる。記録は [Docs/accuracy/device-lab.md](Docs/accuracy/device-lab.md) |
+
+## ライセンス
+
+[Apache License 2.0](LICENSE)。Copyright 2026 akidon0000

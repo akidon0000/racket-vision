@@ -25,6 +25,7 @@ iPhone が `unavailable` のときは、つないでロックを外してもら�
 
 ## その他
 
+- 決めたことは `Docs/adr/`、手順は wiki-* スキル（`wiki-git`、`wiki-repo`）にある。変更のあとは `auto-create-documentation` で記録先を決める。
 - 撮った動画の切り出しは `clip-play-videos`、精度の改善は `improve-vision-accuracy` のスキルの手順に従う。
 - スキルの正本は `.apm/skills/<名前>/`。直すときはそこを編集し、`apm install`（初回は `make setup`）で `.claude/skills/` などへ展開し直す。展開先は git に入れない。
 - シェルの `rm` と `cp` は確認を求める別名になっている。`/bin/rm -f`、`/bin/cp -f` を使う。
